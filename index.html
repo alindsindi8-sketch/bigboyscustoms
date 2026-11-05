@@ -1762,9 +1762,9 @@ body[data-view="admin"] .bb-footer,body[data-view="admin"] .bb-to-top{display:no
     measurementId: 'G-NG15W07ZWH'
   };
   const EMAILJS_CONFIG = {
-    serviceId: '',
-    templateId: '',
-    publicKey: ''
+    serviceId: 'service_30fz8li',
+    templateId: 'template_j1enomt',
+    publicKey: 'i0TVrEsDLwmkCVg5Q'
   };
   const ADMIN_EMAIL = 'bigboys@admin.com';
   const page = document;
@@ -2212,7 +2212,8 @@ body[data-view="admin"] .bb-footer,body[data-view="admin"] .bb-to-top{display:no
           bookingDialog.close();
           try {
             if (!EMAILJS_CONFIG.serviceId || !EMAILJS_CONFIG.templateId || !EMAILJS_CONFIG.publicKey) {
-              throw new Error('EmailJS is not configured. The booking was saved, but the owner notification was not sent.');
+              alert('Your booking was saved, but email is not set up yet. Add your EmailJS Service ID, Template ID, and Public Key to EMAILJS_CONFIG in index.html, then republish the website.');
+              return;
             }
             const emailjs = await import('https://cdn.jsdelivr.net/npm/@emailjs/browser@4/+esm');
             const bookingLink = new URL('/#admin?booking=' + encodeURIComponent(order.id), window.location.origin).toString();
@@ -2230,7 +2231,8 @@ body[data-view="admin"] .bb-footer,body[data-view="admin"] .bb-to-top{display:no
             alert(window.BBApp.translate('Your request was sent. The shop will contact you to confirm your booking.'));
           } catch (emailError) {
             console.error('Booking was saved, but the owner email notification failed.', emailError);
-            alert('Your booking was submitted successfully, but the owner email notification could not be sent. Please call 817-535-2284 to make sure the shop sees your request.');
+            const reason = emailError instanceof Error ? emailError.message : String(emailError);
+            alert('Your booking was saved, but the owner email could not be sent. EmailJS error: ' + reason + '. Check the EmailJS service, template recipient, allowed domain, and free-tier limit.');
           }
         } catch (error) {
           message(bookingMessage, 'Booking could not be sent: ' + error.message, true);
