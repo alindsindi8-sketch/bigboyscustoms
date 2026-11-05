@@ -2,7 +2,8 @@
 
 **Firestore** rules for this site, plus the setup they assume. Publish these in the
 Firebase console. Product photos are stored in Firestore; Firebase Storage is not used.
-Nothing here needs a server, a paid add-on or a service account key.
+The rules themselves do not need a service-account key. Booking email notifications are
+sent through EmailJS from the browser as described in `README.md`.
 
 ---
 
@@ -466,7 +467,8 @@ The console's rules editor does not prove what is enforced, so test by effect:
   API key identifies your project, it does not authorize anything. The rules do that.
 * Never put `serviceAccountKey.json`, a Google private key, an Admin SDK credential, a
   Firebase Auth *admin* token, or a `.env` file in this repository or in `assets/`.
-  There is no backend here, so there is never a reason to.
+  EmailJS public identifiers are intended for browser use, but SMTP passwords and other
+  private credentials must never be placed in this repository.
 * Turn on *App Check* (reCAPTCHA Enterprise is free for modest traffic) if you later find
   bots spamming the contact form — it stops requests from outside your domain.
 * Firestore → *Usage* → turn **test features off** once you are live; that removes the

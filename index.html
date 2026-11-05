@@ -1292,7 +1292,7 @@ body[data-view="admin"] .bb-footer,body[data-view="admin"] .bb-to-top{display:no
     admin: 'Staff Dashboard'
   };
   function pageFromHash() {
-    var page = (win.location.hash || '#home').slice(1);
+    var page = (win.location.hash || '#home').slice(1).split(/[/?]/)[0];
     return pageTitles[page] ? page : 'home';
   }
   var activePage = pageFromHash();
@@ -1761,6 +1761,11 @@ body[data-view="admin"] .bb-footer,body[data-view="admin"] .bb-to-top{display:no
     appId: '1:650314143680:web:ec164b6beccdab2374da25',
     measurementId: 'G-NG15W07ZWH'
   };
+  const EMAILJS_CONFIG = {
+    serviceId: '',
+    templateId: '',
+    publicKey: ''
+  };
   const ADMIN_EMAIL = 'bigboys@admin.com';
   const page = document;
   const $ = (selector) => page.querySelector(selector);
@@ -1958,6 +1963,12 @@ body[data-view="admin"] .bb-footer,body[data-view="admin"] .bb-to-top{display:no
         '</div></td></tr>';
     }).join('');
     if (empty) empty.hidden = orders.length > 0;
+    const requestedBookingId = new URLSearchParams(win.location.hash.split('?')[1] || '').get('booking');
+    const requestedOrder = requestedBookingId && currentOrders.get(requestedBookingId);
+    if (requestedOrder) {
+      showOrderDetails(requestedOrder);
+      win.history.replaceState(null, '', '#admin');
+    }
   }
   function showOrderDetails(order) {
     const dialog = $('#bb-orderDetailDialog');
@@ -2175,7 +2186,7 @@ body[data-view="admin"] .bb-footer,body[data-view="admin"] .bb-to-top{display:no
           } : { id: 'service-booking', quantity: 1, price: 0, name: String(values.get('service')), inventory: false };
           const notes = String(values.get('notes') || '').trim();
           const amount = item.price * item.quantity;
-          await firebase.addDoc(firebase.collection(db, 'orders'), {
+          const order = await firebase.addDoc(firebase.collection(db, 'orders'), {
             status: 'pending',
             customer: {
               name: String(values.get('name')).trim(),
@@ -2199,7 +2210,28 @@ body[data-view="admin"] .bb-footer,body[data-view="admin"] .bb-to-top{display:no
           });
           bookingForm.reset();
           bookingDialog.close();
-          alert(window.BBApp.translate('Your request was sent. The shop will contact you to confirm your booking.'));
+          try {
+            if (!EMAILJS_CONFIG.serviceId || !EMAILJS_CONFIG.templateId || !EMAILJS_CONFIG.publicKey) {
+              throw new Error('EmailJS is not configured. The booking was saved, but the owner notification was not sent.');
+            }
+            const emailjs = await import('https://cdn.jsdelivr.net/npm/@emailjs/browser@4/+esm');
+            const bookingLink = new URL('/#admin?booking=' + encodeURIComponent(order.id), window.location.origin).toString();
+            await emailjs.send(EMAILJS_CONFIG.serviceId, EMAILJS_CONFIG.templateId, {
+              customer_name: String(values.get('name')).trim(),
+              customer_email: String(values.get('email')).trim(),
+              customer_phone: String(values.get('phone')).trim(),
+              service: String(values.get('service')),
+              vehicle: year + ' ' + String(values.get('vehicle')).trim(),
+              date: String(values.get('date')),
+              time: String(values.get('time')),
+              notes: notes || 'None',
+              booking_link: bookingLink
+            }, { publicKey: EMAILJS_CONFIG.publicKey });
+            alert(window.BBApp.translate('Your request was sent. The shop will contact you to confirm your booking.'));
+          } catch (emailError) {
+            console.error('Booking was saved, but the owner email notification failed.', emailError);
+            alert('Your booking was submitted successfully, but the owner email notification could not be sent. Please call 817-535-2284 to make sure the shop sees your request.');
+          }
         } catch (error) {
           message(bookingMessage, 'Booking could not be sent: ' + error.message, true);
         } finally {

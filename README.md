@@ -29,7 +29,7 @@ files; the local server is for preview only.
 6. [Give yourself admin access — securely](#6-configure-admin-access-securely)
 7. [Deploy to Vercel (free)](#7-deploy-to-vercel-free)
 8. [Connect your custom domain](#8-connect-a-custom-domain)
-* [Preview mode and staff dashboard](#preview-mode-and-staff-dashboard) · [Payments and customer data](#payments-and-customer-data) · [Current files](#current-files) · [Troubleshooting](#troubleshooting) · [Security rules](#security-rules)
+* [Booking email notifications](#booking-email-notifications) · [Preview mode and staff dashboard](#preview-mode-and-staff-dashboard) · [Payments and customer data](#payments-and-customer-data) · [Current files](#current-files) · [Troubleshooting](#troubleshooting) · [Security rules](#security-rules)
 
 ---
 
@@ -109,6 +109,37 @@ Create and update these collections through the site:
    custom domain when you have them. `localhost` is there already.
 5. Leave "Email link / Google / Anonymous" off — this dashboard is staff-only and
    customers never create accounts.
+
+## Booking email notifications
+
+Booking emails use EmailJS from the browser, so Firebase Cloud Functions and the Firebase
+Blaze billing plan are not required. EmailJS offers a free tier subject to its current
+usage limits. The booking is saved in Firestore first; if email sending fails, the
+customer is told the booking was still submitted and to call the shop.
+
+1. Create a free account at [EmailJS](https://www.emailjs.com/).
+2. In EmailJS, add an email service and connect the sending mailbox. If you use Gmail,
+   authorize it through EmailJS; never put your Gmail password in this project.
+3. Create an email template. Set the **To email** field directly to
+   `alindsindi8@gmail.com` (do not use a customer-provided value for the recipient).
+   Include these template variables in the subject/body:
+   `{{customer_name}}`, `{{customer_email}}`, `{{customer_phone}}`, `{{service}}`,
+   `{{vehicle}}`, `{{date}}`, `{{time}}`, `{{notes}}`, and `{{booking_link}}`.
+   A suggested message is: “You have a new booking on your website. Please review it:
+   {{booking_link}}”.
+4. In EmailJS account settings, copy the **Public Key**. Also copy the service ID and
+   template ID from their respective pages.
+5. In `index.html`, fill the `serviceId`, `templateId`, and `publicKey` fields in
+   `EMAILJS_CONFIG` with those three values. These are browser-side public identifiers,
+   not passwords. Do not put SMTP passwords, private keys, or other secrets in the page.
+6. Publish the updated website, then submit a test booking. Check
+   **alindsindi8@gmail.com**. The link opens the staff dashboard and, after an authorized
+   staff member signs in, displays that booking’s details.
+
+Because EmailJS sends from the browser, set its allowed origins/domain restrictions in
+the EmailJS dashboard to your website domain, and keep the template recipient fixed to
+the owner’s address. Check the EmailJS dashboard for current free-tier limits and
+delivery status.
 
 ## 5. Product photos (no Storage needed)
 
@@ -254,6 +285,6 @@ played muted and looped behind the home hero.
 Read [`firebase-rules.md`](firebase-rules.md) before you tell anyone the site is live.
 It contains the publishable Firestore rules, the reasoning behind each one,
 the first-admin bootstrap, how to deploy rules from the CLI, checks that prove
-enforcement by effect rather than by reading the console, and the credentials checklist
-(nothing like a service account key belongs in this folder — there is no backend here
-that could keep it secret).
+enforcement by effect rather than by reading the console, and the credentials checklist.
+EmailJS uses public browser identifiers; never put SMTP passwords or private credentials
+in this folder or the website code.
