@@ -222,7 +222,7 @@ service cloud.firestore {
       allow create: if hasOrderShape() && hasLineShape();
 
       // Staff may confirm/cancel bookings or mark one sold; the dashboard uses
-      // a transaction so a sold wheel and its inventory decrement happen together.
+      // transactions so status changes and stock reservations/releases happen together.
       // Customers can never change a booking or stock.
       allow update: if isStaff();
 
@@ -454,8 +454,10 @@ The console's rules editor does not prove what is enforced, so test by effect:
    ```
 3. Sign in as staff and confirm adding, editing, and deleting products changes the
    public catalogue while exact stock remains visible only in the dashboard.
-4. Mark a product booking sold; verify inventory decreases once. Try marking it sold
-   again and verify it is refused.
+4. Create a product booking and verify pending status does not change stock. Confirm it
+   and verify stock decreases by the requested quantity. Cancel the confirmed booking
+   and verify that quantity is returned. Confirm another booking and mark it sold;
+   verify stock is not deducted twice.
 5. Submit another booking from a separate browser; verify it appears in the signed-in
    dashboard with customer details. Sign out and confirm those details disappear.
 

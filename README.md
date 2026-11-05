@@ -195,8 +195,9 @@ Answer the prompts: link to your account, project name `bigboys-customs`, framew
 preset **Other**, everything else **Enter** (no build command, no install, output
 directory `.`). Run `vercel` again later for a preview, `vercel --prod` to publish.
 
-No build step exists. Keep `bg.mp4` next to `index.html`. [`vercel.json`](vercel.json) only sets cache
-headers and clean URLs; deleting the file is harmless.
+No build step exists. Keep `bg.mp4` and `BigBoysCustoms_Intro.mp4` next to `index.html`.
+The intro video plays on the home page and can be skipped. [`vercel.json`](vercel.json)
+only sets cache headers and clean URLs; deleting the file is harmless.
 
 Then finish the loop: Firebase → Authentication → Settings → **Authorized domains** →
 add `your-app.vercel.app`.
@@ -234,9 +235,11 @@ published:
    Lift Kits, and Drop Kits. Visitors can switch languages with the globe button; product
    photos are stored in Firestore without Firebase Storage. Shop cards show live stock and
    can be filtered by category.
-* Staff can confirm, cancel, delete, or mark a booking sold. Marking a product booking
-  sold decrements the product stock in the same Firestore transaction as the status
-  change, so the two changes succeed or fail together.
+* A pending booking does not reduce inventory. When staff confirm a product booking,
+  its requested quantity is deducted from available stock in the same Firestore
+  transaction as the status change. Cancelling or deleting a confirmed booking returns
+  its reserved quantity to stock. Marking a pending booking sold deducts stock; marking
+  an already confirmed booking sold does not deduct it a second time.
 * The dashboard is responsive on mobile; its tables can scroll horizontally when
   necessary.
 
@@ -258,6 +261,7 @@ Do not use the site for real bookings until the rules are published and tested.
 big boys/
 ├── index.html         storefront, page views, booking form, staff dashboard
 ├── bg.mp4             home hero background video (keep beside index.html)
+├── BigBoysCustoms_Intro.mp4 full-screen home-page intro (keep beside index.html)
 ├── firebase-rules.md  Firestore security rules to publish
 ├── vercel.json        static hosting headers
 ├── style.css          legacy stylesheet (not loaded by the current page)
@@ -266,8 +270,9 @@ big boys/
 ```
 
 The wheel illustrations, page styles, animations, Firebase SDK integration, and page
-logic are embedded in `index.html`. The video is the one required adjacent asset; it is
-played muted and looped behind the home hero.
+logic are embedded in `index.html`. Keep both video files beside it: `bg.mp4` plays
+muted and loops behind the home hero, while `BigBoysCustoms_Intro.mp4` plays as the
+skippable full-screen home-page intro.
 
 ## Troubleshooting
 
