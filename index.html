@@ -239,6 +239,12 @@ h1,h2,h3,h4,.bb-display{font-family:var(--bb-font-display);font-weight:600;lette
 .bb-burger{margin-inline-start:auto;width:44px;height:44px;display:grid;place-items:center;gap:5px;background:var(--bb-glass);
   border:1px solid var(--bb-line);border-radius:12px;cursor:pointer;transition:background .3s,border-color .3s}
 .bb-burger:hover{background:var(--bb-glass-strong);border-color:var(--bb-jade)}
+.bb-language-toggle{margin-inline-start:auto;width:58px;height:44px;display:flex;align-items:center;justify-content:center;gap:5px;
+  border:1px solid var(--bb-line);border-radius:12px;background:var(--bb-glass);color:var(--bb-white);cursor:pointer;
+  font-family:var(--bb-font-display);font-size:.72rem;font-weight:600;letter-spacing:.08em;transition:background .3s,border-color .3s}
+.bb-language-toggle:hover,.bb-language-toggle:focus-visible{background:var(--bb-glass-strong);border-color:var(--bb-jade)}
+.bb-language-toggle svg{width:18px;height:18px;flex:0 0 auto}
+.bb-header-inner>.bb-language-toggle+.bb-burger{margin-inline-start:8px}
 .bb-burger i{display:block;width:19px;height:2px;background:#fff;transition:transform .3s var(--bb-ease),opacity .2s}
 .bb-burger[aria-expanded="true"] i:nth-child(1){transform:translateY(7px) rotate(45deg)}
 .bb-burger[aria-expanded="true"] i:nth-child(2){opacity:0}
@@ -246,6 +252,7 @@ h1,h2,h3,h4,.bb-display{font-family:var(--bb-font-display);font-weight:600;lette
 @media (min-width:1024px){
   .bb-nav,.bb-header-cta{display:flex}
   .bb-burger{display:none}
+  .bb-header-inner>.bb-language-toggle{margin-inline-start:0}
 }
 
 /* mobile menu */
@@ -632,6 +639,10 @@ body[data-view="admin"] .bb-footer,body[data-view="admin"] .bb-to-top{display:no
       </a>
       <a class="bb-btn bb-btn-primary bb-btn-sm" href="#shop">Shop wheels</a>
     </div>
+    <button type="button" class="bb-language-toggle" id="bb-languageToggle" aria-label="Change language" title="Change language">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3a15 15 0 0 1 0 18M12 3a15 15 0 0 0 0 18"/></svg>
+      <span id="bb-languageCode">EN</span>
+    </button>
     <button type="button" class="bb-burger" id="bb-burger" aria-expanded="false" aria-controls="bb-mobile" aria-label="Open menu">
       <i></i><i></i><i></i>
     </button>
@@ -939,11 +950,11 @@ body[data-view="admin"] .bb-footer,body[data-view="admin"] .bb-to-top{display:no
       </div>
       <div class="bb-admin-panel bb-admin-login" id="bb-adminLoginPanel">
         <h3>Staff sign in</h3>
-        <p class="bb-admin-hint" id="bb-adminSetupNote">Firebase is not connected yet. The dashboard will stay locked until the Firebase web config and staff access are set up.</p>
+        <p class="bb-admin-hint" id="bb-adminSetupNote">Checking Firebase configuration…</p>
         <form id="bb-adminLoginForm" class="bb-form-grid">
           <div class="bb-field bb-field-wide">
             <label for="bb-adminEmail">Email</label>
-            <input id="bb-adminEmail" name="email" type="email" autocomplete="username" value="Bigboyscustoms@live.com" required/>
+            <input id="bb-adminEmail" name="email" type="email" autocomplete="username" value="bigboys@admin.com" required/>
           </div>
           <div class="bb-field bb-field-wide">
             <label for="bb-adminPassword">Password</label>
@@ -962,24 +973,28 @@ body[data-view="admin"] .bb-footer,body[data-view="admin"] .bb-to-top{display:no
             <button class="bb-btn bb-btn-ghost bb-btn-sm" type="button" id="bb-adminSignOut">Sign out</button>
           </div>
             <form id="bb-adminCategoryForm" class="bb-form-grid" style="margin-top:20px">
-              <div class="bb-field"><label for="bb-categoryName">New category</label><input id="bb-categoryName" name="name" maxlength="60" placeholder="e.g. Lift Kits" required/></div>
-              <div class="bb-field" style="align-content:end"><button class="bb-btn bb-btn-ghost bb-btn-sm" type="submit">Add category</button></div>
+              <div class="bb-field"><label for="bb-categoryName">Category name (English)</label><input id="bb-categoryName" name="name" maxlength="60" placeholder="e.g. Lift Kits" required/></div>
+              <div class="bb-field"><label for="bb-categoryNameEs">Category name (Spanish)</label><input id="bb-categoryNameEs" name="nameEs" maxlength="60" placeholder="p. ej. Kits de elevación" required/></div>
+              <div class="bb-field bb-field-wide"><button class="bb-btn bb-btn-ghost bb-btn-sm" type="submit">Add category</button></div>
               <p class="bb-form-note bb-field-wide" id="bb-categoryMessage" role="status" aria-live="polite"></p>
             </form>
           <form id="bb-adminProductForm" class="bb-form-grid" style="margin-top:20px">
             <input type="hidden" name="id"/>
-            <div class="bb-field"><label for="bb-productName">Product name</label><input id="bb-productName" name="name" maxlength="120" required/></div>
+            <div class="bb-field"><label for="bb-productName">Product name (English)</label><input id="bb-productName" name="name" maxlength="120" required/></div>
+            <div class="bb-field"><label for="bb-productNameEs">Product name (Spanish)</label><input id="bb-productNameEs" name="nameEs" maxlength="120" required/></div>
             <div class="bb-field"><label for="bb-productBrand">Brand</label><input id="bb-productBrand" name="brand" maxlength="80" required/></div>
             <div class="bb-field"><label for="bb-productSize">Size / fitment</label><input id="bb-productSize" name="size" maxlength="80" required/></div>
             <div class="bb-field"><label for="bb-productPrice">Price ($)</label><input id="bb-productPrice" name="price" type="number" min="0" step="0.01" required/></div>
             <div class="bb-field"><label for="bb-productWas">Compare-at price ($)</label><input id="bb-productWas" name="was" type="number" min="0" step="0.01"/></div>
             <div class="bb-field"><label for="bb-productStock">Quantity in stock</label><input id="bb-productStock" name="stock" type="number" min="0" step="1" required/></div>
             <div class="bb-field"><label for="bb-productSku">SKU</label><input id="bb-productSku" name="sku" maxlength="80"/></div>
-            <div class="bb-field"><label for="bb-productCategory">Category</label><input id="bb-productCategory" name="category" list="bb-productCategoryOptions" maxlength="60" value="Wheels &amp; Tires" required/><datalist id="bb-productCategoryOptions"></datalist></div>
+            <div class="bb-field"><label for="bb-productCategory">Category (English)</label><input id="bb-productCategory" name="category" list="bb-productCategoryOptions" maxlength="60" value="Wheels &amp; Tires" required/><datalist id="bb-productCategoryOptions"></datalist></div>
+            <div class="bb-field"><label for="bb-productCategoryEs">Category (Spanish)</label><input id="bb-productCategoryEs" name="categoryEs" maxlength="60" value="Rines y llantas" required/></div>
             <div class="bb-field"><label for="bb-productFinish">Finish</label><select id="bb-productFinish" name="finish"><option value="chrome">Chrome</option><option value="milled">Milled</option><option value="black">Black</option><option value="bronze">Bronze</option></select></div>
             <div class="bb-field"><label for="bb-productSpokes">Spoke count</label><input id="bb-productSpokes" name="spokes" type="number" min="3" max="16" step="1" value="6"/></div>
             <div class="bb-field bb-field-wide"><label for="bb-productImage">Product photo (optional, max 600 KB after compression)</label><input id="bb-productImage" name="image" type="file" accept="image/jpeg,image/png,image/webp,image/avif"/><label style="display:flex;align-items:center;gap:8px;text-transform:none;letter-spacing:0"><input type="checkbox" name="removeImage"/> Remove current photo</label><img id="bb-productImagePreview" alt="Product photo preview" hidden style="width:140px;height:100px;object-fit:contain;border:1px solid var(--bb-line);border-radius:8px"/></div>
             <div class="bb-field bb-field-wide"><label for="bb-productDescription">Description</label><textarea id="bb-productDescription" name="desc" maxlength="500"></textarea></div>
+            <div class="bb-field bb-field-wide"><label for="bb-productDescriptionEs">Description (Spanish)</label><textarea id="bb-productDescriptionEs" name="descEs" maxlength="500"></textarea></div>
             <div class="bb-field bb-field-wide">
               <div class="bb-admin-actions"><button class="bb-btn bb-btn-primary bb-btn-sm" id="bb-productSave" type="submit">Add product</button><button type="button" id="bb-productCancel" hidden>Cancel edit</button></div>
               <p class="bb-form-note" id="bb-productMessage" role="status" aria-live="polite"></p>
@@ -1097,6 +1112,159 @@ body[data-view="admin"] .bb-footer,body[data-view="admin"] .bb-to-top{display:no
   var reduced = win.matchMedia && win.matchMedia('(prefers-reduced-motion: reduce)').matches;
   var $  = function (s, r) { return (r || doc).querySelector(s); };
   var $$ = function (s, r) { return Array.prototype.slice.call((r || doc).querySelectorAll(s)); };
+  var spanishText = {
+    'Skip to main content': 'Saltar al contenido principal', 'Brands we carry': 'Marcas que manejamos', 'Map to BIGBOYS CUSTOMS': 'Mapa de BIGBOYS CUSTOMS',
+    'Skip intro': 'Saltar introducción', 'Open 7 days': 'Abierto 7 días', 'All rights reserved.': 'Todos los derechos reservados.',
+    'Developed by Alind Sindi on Instagram': 'Desarrollado por Alind Sindi en Instagram',
+    'Switch language to Spanish': 'Cambiar idioma a español', 'Switch language to English': 'Cambiar idioma a inglés',
+    'Home': 'Inicio', 'Shop': 'Tienda', 'Services': 'Servicios',
+    'Why us': 'Por qué nosotros', 'Contact': 'Contacto', 'Why Us': 'Por qué nosotros', 'Staff Dashboard': 'Panel del personal',
+    'Open menu': 'Abrir menú', 'Close menu': 'Cerrar menú', 'Change language': 'Cambiar idioma',
+    'Filter products by category': 'Filtrar productos por categoría', 'All': 'Todos',
+    'Call 817-535-2284': 'Llama al 817-535-2284', 'We are your one stop shop': 'Somos tu tienda todo en uno',
+    'Shop wheels': 'Ver rines', 'Shop the sets': 'Ver conjuntos', 'Talk to the shop': 'Habla con el taller',
+    'Custom wheels & tires · Forest Hill, Texas': 'Rines y llantas personalizados · Forest Hill, Texas',
+    'Built different. Rolled out today.': 'Hechos diferente. Listos para rodar hoy.',
+    'American Force, Forgiato and Intros sets, tires in the size you run, lift and drop kits, then mounted, balanced and torqued to spec in our own bays. Bring the truck, bring the vision — we handle the rest.': 'Conjuntos American Force, Forgiato e Intros, llantas del tamaño que necesitas y kits de elevación y descenso. Los montamos, balanceamos y ajustamos según las especificaciones en nuestro taller. Trae tu camioneta y tu idea; nosotros nos encargamos del resto.',
+    'Open 7 days a week': 'Abierto los 7 días de la semana', 'Financing available': 'Financiamiento disponible',
+    'Nationwide shipping': 'Envíos a todo el país', 'Free fitment check': 'Revisión de compatibilidad gratis', 'Scroll': 'Desliza',
+    '22" – 26" forged': 'Rines forjados de 22" a 26"', '35" – 40" tires': 'Llantas de 35" a 40"', '6" lift systems': 'Sistemas de elevación de 6"',
+    'Forged & cast': 'Forjados y fundidos', 'Luxury lines': 'Líneas de lujo', 'Chrome & color': 'Cromo y color',
+    'Complete kits': 'Kits completos', 'Stance setups': 'Configuraciones de altura', 'Featured setups': 'Configuraciones destacadas',
+    'Fresh on the floor': 'Lo nuevo en la tienda',
+    'A slice of what is in stock right now. Sizes, finishes and packages get confirmed on the phone — then mounted, balanced and test fitted before you leave.': 'Una muestra de lo que tenemos disponible. Confirmamos tamaños, acabados y paquetes por teléfono; luego montamos, balanceamos y probamos el ajuste antes de que te vayas.',
+    'No products available right now. Please call the shop for availability.': 'No hay productos disponibles en este momento. Llama al taller para consultar.',
+    'No products are listed yet. Please call the shop for availability.': 'Aún no hay productos publicados. Llama al taller para consultar.',
+    'Sample inventory and prices are for preview only. The shop will confirm current stock and final pricing when contacting you.': 'El inventario y los precios de muestra son solo una vista previa. El taller confirmará existencias y precio final al comunicarse contigo.',
+    'What we do': 'Lo que hacemos', 'One stop, start to finish': 'Todo en un solo lugar', 'Book a service': 'Reservar servicio',
+    'Talk to the shop': 'Habla con el taller', 'Call, text or stop in with the vehicle, size and budget. We tell you what actually fits and what it costs before anything is ordered.': 'Llama, escribe o visítanos con tu vehículo, tamaño y presupuesto. Te diremos qué le queda y cuánto cuesta antes de pedirlo.',
+    'We source it': 'Lo conseguimos', 'Brand-new American Force, Forgiato and Intros sets, tires in the size you run and hardware for the kit — through real distribution.': 'Conjuntos nuevos American Force, Forgiato e Intros, llantas de tu tamaño y piezas para el kit, mediante distribuidores autorizados.',
+    'Mounted & balanced': 'Montaje y balanceo', 'Test fit, mount, balance, torque to spec and a road check in our own bays. Alignment after any suspension work.': 'Probamos el ajuste, montamos, balanceamos, aplicamos el torque indicado y revisamos en carretera. Alineación después de cualquier trabajo de suspensión.',
+    'Ship or finance': 'Envío o financiamiento', 'Nationwide shipping packed on pallets, or financing on qualifying setups so the wheels go on now and you pay over time.': 'Envíos a todo el país en tarimas o financiamiento para configuraciones elegibles: instala tus rines ahora y paga con el tiempo.',
+    'Why choose us': 'Por qué elegirnos', 'People who drive what they sell': 'Vendemos lo que manejamos',
+    'Fitment before you buy': 'Compatibilidad antes de comprar', 'Year, make, model, lift or drop — we check offset, backspacing and fender clearance. Test fit is free in the shop.': 'Revisamos año, marca, modelo, elevación o descenso, desplazamiento y espacio en la salpicadera. La prueba de ajuste es gratis en el taller.',
+    'Authorized-level brands': 'Marcas de confianza', 'American Force, Forgiato and Intros only. No copies, no mystery imports — real product with real support.': 'Solo American Force, Forgiato e Intros. Sin copias ni importaciones desconocidas: productos auténticos con respaldo real.',
+    'Open seven days': 'Abierto los siete días', 'Weekend build day works for us. Walk in, or call ahead and we have the bay and the size ready when you land.': 'También trabajamos los fines de semana. Visítanos o llama antes para tener listo el espacio y el tamaño que necesitas.',
+    'Financing that makes sense': 'Financiamiento conveniente', 'Qualifying setups can be financed so the truck gets the wheels now. We walk you through the numbers, no surprises.': 'Algunas configuraciones califican para financiamiento. Te explicamos los números sin sorpresas.',
+    'Setups mounted': 'Configuraciones instaladas', 'Years on the Hwy': 'Años en Mansfield Hwy', 'Days open a week': 'Días abierto por semana', 'Fitment checked': 'Compatibilidad verificada',
+    'Common questions': 'Preguntas frecuentes', 'Questions & answers': 'Preguntas y respuestas',
+    'Will it fit my truck?': '¿Le quedará a mi camioneta?', 'Give us the year, make, model and the lift or drop you are running. We check offset, backspacing and clearance before you buy.': 'Dinos el año, marca, modelo y la elevación o descenso. Revisamos desplazamiento y espacio antes de que compres.',
+    'How does payment work?': '¿Cómo funciona el pago?', 'Orders placed here are quotes — we call to confirm the size, the finish and the total before anything is charged. Financing is available on qualifying setups.': 'Las solicitudes aquí son cotizaciones. Llamamos para confirmar tamaño, acabado y total antes de cobrar. Hay financiamiento para configuraciones elegibles.',
+    'Can you ship to me?': '¿Hacen envíos?', 'Yes — wheels, tires and complete packages ship nationwide, packed on pallets with tracking sent to your phone.': 'Sí. Enviamos rines, llantas y paquetes completos a todo el país en tarimas, con seguimiento a tu teléfono.',
+    'Do I need an appointment?': '¿Necesito una cita?', 'Walk-ins are fine seven days a week. For larger suspension jobs a quick call keeps a bay free for your truck.': 'Aceptamos visitas sin cita los siete días. Para trabajos grandes de suspensión, llama para reservar un espacio.',
+    'Come see us': 'Ven a visitarnos', 'The shop is open': 'El taller está abierto',
+    '3100 Mansfield Hwy, Forest Hill, TX 76119. Call, text or drive through — we will tell you what fits, what it costs and how long it takes.': '3100 Mansfield Hwy, Forest Hill, TX 76119. Llama, escribe o visítanos; te diremos qué le queda, cuánto cuesta y cuánto tarda.',
+    'Phone & text': 'Teléfono y mensajes', 'Address': 'Dirección', 'Hours': 'Horario', 'OPEN 7 DAYS A WEEK!': '¡ABIERTO LOS 7 DÍAS!',
+    'Email': 'Correo electrónico', 'Call now': 'Llamar ahora', 'Get directions': 'Cómo llegar', 'Follow the builds': 'Sigue nuestros proyectos',
+    'Forest Hill, TX 76119': 'Forest Hill, TX 76119', 'Mansfield Hwy · 7 days': 'Mansfield Hwy · 7 días',
+    'Your next set': 'Tu próximo conjunto', 'Build your dream ride with BIGBOYS CUSTOMS.': 'Arma tu camioneta ideal con BIGBOYS CUSTOMS.',
+    'Custom wheels, tires, lift kits and drop kits — sourced, mounted and balanced in Forest Hill, Texas. We are your one stop shop.': 'Rines, llantas y kits de elevación y descenso, conseguidos, instalados y balanceados en Forest Hill, Texas. Somos tu tienda todo en uno.',
+    'Bring your size, your budget and the look you want. We will put the wheels on, balance them, torque them and hand you the keys.': 'Trae el tamaño, presupuesto y estilo que buscas. Instalamos y balanceamos los rines, aplicamos el torque correcto y te entregamos las llaves.',
+    'See the sets': 'Ver conjuntos', 'Private staff area': 'Área privada del personal', 'Shop dashboard': 'Panel de la tienda',
+    'Sign in with an authorized staff account to manage wheel inventory and customer booking requests.': 'Inicia sesión con una cuenta autorizada para administrar productos y solicitudes de clientes.',
+    'Staff sign in': 'Acceso del personal', 'Checking Firebase configuration…': 'Comprobando la configuración de Firebase…',
+    'Firebase configuration loaded. Sign in with an authorized staff account.': 'Configuración de Firebase cargada. Inicia sesión con una cuenta autorizada.',
+    'Sign in': 'Iniciar sesión', 'Products & categories': 'Productos y categorías',
+    'Manage wheels, tires, lift kits and drop kits. Product photos are stored in Firestore; Firebase Storage is not used.': 'Administra rines, llantas y kits de elevación y descenso. Las fotos se guardan en Firestore; no se usa Firebase Storage.',
+    'Sign out': 'Cerrar sesión', 'Category name (English)': 'Nombre de categoría (inglés)', 'Category name (Spanish)': 'Nombre de categoría (español)',
+    'Add category': 'Agregar categoría', 'e.g. Lift Kits': 'p. ej. Lift Kits', 'p. ej. Kits de elevación': 'p. ej. Kits de elevación',
+    'Product name (English)': 'Nombre del producto (inglés)', 'Product name (Spanish)': 'Nombre del producto (español)',
+    'Brand': 'Marca', 'Size / fitment': 'Tamaño / compatibilidad', 'Price ($)': 'Precio ($)', 'Compare-at price ($)': 'Precio anterior ($)',
+    'Quantity in stock': 'Cantidad disponible', 'SKU': 'SKU', 'Category (English)': 'Categoría (inglés)', 'Category (Spanish)': 'Categoría (español)',
+    'Finish': 'Acabado', 'Spoke count': 'Número de rayos', 'Product photo (optional, max 600 KB after compression)': 'Foto del producto (opcional, máximo 600 KB comprimida)',
+    'Remove current photo': 'Quitar foto actual', 'Product photo preview': 'Vista previa de la foto', 'Description': 'Descripción', 'Description (Spanish)': 'Descripción (español)',
+    'Add product': 'Agregar producto', 'Save changes': 'Guardar cambios', 'Cancel edit': 'Cancelar edición', 'No inventory products yet. Add a product above.': 'Aún no hay productos. Agrega uno arriba.',
+    'Signing in…': 'Iniciando sesión…', 'Category saved.': 'Categoría guardada.', 'Product saved.': 'Producto guardado.', 'Product deleted.': 'Producto eliminado.',
+    'Booking updated.': 'Solicitud actualizada.', 'Enter a category name using letters or numbers.': 'Escribe el nombre de la categoría con letras o números.',
+    'Check the name, price, stock quantity, and spoke count.': 'Revisa el nombre, precio, existencias y número de rayos.',
+    'Choose an image file.': 'Elige un archivo de imagen.', 'Photo is too large to store in Firestore. Choose a smaller image.': 'La foto es demasiado grande para Firestore. Elige una imagen más pequeña.',
+    'The shop will contact you to confirm your booking.': 'El taller se comunicará contigo para confirmar la reserva.',
+    'This account does not have staff access.': 'Esta cuenta no tiene acceso al personal.',
+    'Booking requests': 'Solicitudes de reserva', 'Customer details are only loaded after authorized staff sign in.': 'Los datos de clientes solo se cargan después del acceso autorizado.',
+    'Customer / vehicle': 'Cliente / vehículo', 'Request': 'Solicitud', 'Preferred date': 'Fecha preferida', 'Status': 'Estado', 'Actions': 'Acciones',
+    'No booking requests yet.': 'Aún no hay solicitudes.', 'Book a visit': 'Reservar una visita', 'Close booking form': 'Cerrar formulario de reserva',
+    'Tell us what you need and the shop will contact you to confirm availability.': 'Cuéntanos qué necesitas y el taller se comunicará contigo para confirmar disponibilidad.',
+    'Full name': 'Nombre completo', 'Phone': 'Teléfono', 'Password': 'Contraseña', 'What do you need?': '¿Qué necesitas?', 'Choose a service': 'Elige un servicio',
+    'Wheel / tire purchase': 'Compra de rines / llantas', 'Mount & balance': 'Montaje y balanceo', 'Lift kit': 'Kit de elevación', 'Drop kit': 'Kit de descenso',
+    'Fitment check': 'Revisión de compatibilidad', 'Other': 'Otro', 'Quantity': 'Cantidad', 'Vehicle year': 'Año del vehículo', 'Make & model': 'Marca y modelo',
+    'Preferred time': 'Hora preferida', 'Morning': 'Mañana', 'Afternoon': 'Tarde', 'Any time': 'Cualquier hora', 'Details / questions': 'Detalles / preguntas',
+    'Wheel size, finish, budget, or anything else we should know': 'Tamaño, acabado, presupuesto u otro detalle importante',
+    'Send booking request': 'Enviar solicitud', 'Your request was sent. The shop will contact you to confirm your booking.': 'Enviamos tu solicitud. El taller se comunicará contigo para confirmar.',
+    'Explore': 'Explorar', 'Shop wheels & tires': 'Comprar rines y llantas', 'Why choose us': 'Por qué elegirnos', 'Contact & map': 'Contacto y mapa',
+    'Lift & drop kits': 'Kits de elevación y descenso', 'Financing & shipping': 'Financiamiento y envíos', 'What we run': 'Nuestras marcas', 'Visit the shop': 'Visita el taller',
+    'All rights reserved.': 'Todos los derechos reservados.', 'Developed by': 'Desarrollado por', 'Back to top': 'Volver arriba',
+    'In stock': 'Disponible', 'Featured': 'Destacado', 'Luxury': 'Lujo', 'Sale': 'Oferta', 'Package': 'Paquete', 'Demo': 'Muestra',
+    'Currently unavailable': 'No disponible', 'Stock confirmed by shop': 'Existencias por confirmar', 'Out of stock': 'Agotado',
+    'Ask about this item': 'Consultar este producto', 'Book this set': 'Reservar este conjunto', 'sets available': 'conjuntos disponibles',
+    'set available': 'conjunto disponible', 'items available': 'artículos disponibles', 'item available': 'artículo disponible',
+    'Edit': 'Editar', 'Delete': 'Eliminar', 'Confirm': 'Confirmar', 'Mark sold': 'Marcar como vendido', 'Cancel': 'Cancelar', 'Qty': 'Cant.',
+    'pending': 'pendiente', 'confirmed': 'confirmado', 'cancelled': 'cancelado', 'sold': 'vendido', 'No phone': 'Sin teléfono',
+    'Not specified': 'No especificado', 'No products available right now. Please call the shop for availability.': 'No hay productos disponibles ahora. Llama al taller.',
+    'Could not load the current catalogue. Please call 817-535-2284.': 'No se pudo cargar el catálogo. Llama al 817-535-2284.',
+    'Connecting to the live product catalogue…': 'Conectando al catálogo…',
+    'Sample inventory and prices are for preview only. The shop will confirm current stock and final pricing when contacting you.': 'El inventario y los precios son de muestra. El taller confirmará existencias y precio final al contactarte.'
+  };
+  var language = localStorage.getItem('bb-language') === 'es' ? 'es' : 'en';
+  function normalizedText(value) { return String(value || '').replace(/\s+/g, ' ').trim(); }
+  function translate(value) { return language === 'es' ? (spanishText[normalizedText(value)] || value) : value; }
+  function localizePage(root) {
+    var walker = doc.createTreeWalker(root || doc.body, NodeFilter.SHOW_TEXT);
+    var node;
+    while ((node = walker.nextNode())) {
+      if (!node.parentElement || /^(SCRIPT|STYLE|NOSCRIPT)$/.test(node.parentElement.tagName)) continue;
+      if (node.__bbEnglishText === undefined) node.__bbEnglishText = node.nodeValue;
+      var source = node.__bbEnglishText;
+      var key = normalizedText(source);
+      if (!key || !spanishText[key]) continue;
+      var leading = source.match(/^\s*/)[0];
+      var trailing = source.match(/\s*$/)[0];
+      node.nodeValue = leading + (language === 'es' ? spanishText[key] : key) + trailing;
+    }
+    ['placeholder', 'aria-label', 'title'].forEach(function (attribute) {
+      $$('[placeholder],[aria-label],[title]', root || doc).forEach(function (element) {
+        var storageKey = '__bbEnglish_' + attribute;
+        if (element[storageKey] === undefined && element.hasAttribute(attribute)) element[storageKey] = element.getAttribute(attribute);
+        var original = element[storageKey];
+        if (original !== undefined) element.setAttribute(attribute, language === 'es' ? (spanishText[normalizedText(original)] || original) : original);
+      });
+    });
+  }
+  function updateLanguageControl() {
+    var button = $('#bb-languageToggle');
+    var code = $('#bb-languageCode');
+    if (code) code.textContent = language.toUpperCase();
+    if (button) {
+      var label = language === 'es' ? 'Cambiar idioma a inglés' : 'Switch language to Spanish';
+      button.setAttribute('aria-label', label);
+      button.title = label;
+    }
+    doc.documentElement.lang = language;
+  }
+  function setLanguage(next) {
+    language = next === 'es' ? 'es' : 'en';
+    localStorage.setItem('bb-language', language);
+    localizePage(doc.body);
+    updateLanguageControl();
+    var heroTitle = $('#bb-heroTitle');
+    if (heroTitle) {
+      var titleText = language === 'es' ? 'Hechos diferente. Listos para rodar hoy.' : 'Built different. Rolled out today.';
+      heroTitle.innerHTML = titleText.split(/\s+/).map(function (word) {
+        return '<span class="bb-word"><i>' + word + '</i></span> ';
+      }).join('');
+      if (typeof startHero === 'function') startHero();
+    }
+    showPage(activePage, false);
+    if (win.BBApp) {
+      win.BBApp.renderCategoryOptions();
+      win.BBApp.renderProducts(PRODUCTS);
+    }
+    doc.dispatchEvent(new CustomEvent('bb-language-change', { detail: { language: language } }));
+  }
+  function categoryLabel(name, spanishName) {
+    if (language !== 'es') return name || '';
+    var defaults = { 'Wheels & Tires': 'Rines y llantas', 'Lift Kits': 'Kits de elevación', 'Drop Kits': 'Kits de descenso' };
+    return spanishName || categoryTranslations[name] || defaults[name] || name || '';
+  }
   var pageTitles = {
     home: 'Home',
     shop: 'Shop',
@@ -1115,8 +1283,10 @@ body[data-view="admin"] .bb-footer,body[data-view="admin"] .bb-to-top{display:no
   function showPage(page, scrollToTop) {
     activePage = pageTitles[page] ? page : 'home';
     doc.body.setAttribute('data-view', activePage);
-    doc.title = (activePage === 'home' ? 'BIGBOYS CUSTOMS' : pageTitles[activePage] + ' | BIGBOYS CUSTOMS') +
-      ' | Custom Wheels, Tires & Lift Kits — Forest Hill, TX';
+    var title = pageTitles[activePage];
+    if (language === 'es') title = { home: 'Inicio', shop: 'Tienda', services: 'Servicios', why: 'Por qué nosotros', contact: 'Contacto', admin: 'Panel del personal' }[activePage];
+    doc.title = (activePage === 'home' ? 'BIGBOYS CUSTOMS' : title + ' | BIGBOYS CUSTOMS') +
+      (language === 'es' ? ' | Rines, llantas y kits — Forest Hill, TX' : ' | Custom Wheels, Tires & Lift Kits — Forest Hill, TX');
     $$('a[href^="#"]').forEach(function (link) {
       var isActive = link.getAttribute('href') === '#' + activePage;
       if (link.classList.contains('bb-mobile-link') || (link.parentNode && link.parentNode.classList.contains('bb-nav'))) {
@@ -1257,24 +1427,30 @@ body[data-view="admin"] .bb-footer,body[data-view="admin"] .bb-to-top{display:no
     var finish = ['chrome', 'milled', 'black', 'bronze'].indexOf(p.finish) >= 0 ? p.finish : 'chrome';
     var spokes = Math.min(16, Math.max(3, Number(p.spokes) || 6));
     var disabled = stockKnown && stock < 1;
+    var productName = language === 'es' ? (p.nameEs || p.name) : p.name;
+    var productDescription = language === 'es' ? (p.descEs || p.desc) : p.desc;
+    var productCategory = categoryLabel(p.category, p.categoryEs);
+    var stockText = disabled ? translate('Currently unavailable') : !stockKnown ? translate('Stock confirmed by shop') :
+      language === 'es' ? stock + (String(p.category || '').toLowerCase().includes('wheel') ? (stock === 1 ? ' conjunto disponible' : ' conjuntos disponibles') : (stock === 1 ? ' artículo disponible' : ' artículos disponibles')) :
+      stock + (String(p.category || '').toLowerCase().includes('wheel') ? (stock === 1 ? ' set available' : ' sets available') : (stock === 1 ? ' item available' : ' items available'));
     return '<article class="bb-card">' +
       '<div class="bb-card-media">' +
-        '<div class="bb-card-flags"><span class="bb-badge bb-badge-red">' + escapeHTML(p.flag || p.category || 'In stock') + '</span>' +
-          (p.demo ? '<span class="bb-badge">Demo</span>' : '') + '</div>' +
-        (p.imageData ? '<img class="bb-product-image" src="' + escapeHTML(p.imageData) + '" alt="' + escapeHTML(p.name) + '" loading="lazy">' :
-          wheelSVG({ finish: finish, spokes: spokes, label: escapeHTML(p.name) })) +
+        '<div class="bb-card-flags"><span class="bb-badge bb-badge-red">' + escapeHTML(translate(p.flag || productCategory || 'In stock')) + '</span>' +
+          (p.demo ? '<span class="bb-badge">' + translate('Demo') + '</span>' : '') + '</div>' +
+        (p.imageData ? '<img class="bb-product-image" src="' + escapeHTML(p.imageData) + '" alt="' + escapeHTML(productName) + '" loading="lazy">' :
+          wheelSVG({ finish: finish, spokes: spokes, label: escapeHTML(productName) })) +
       '</div>' +
       '<div class="bb-card-body">' +
         '<div class="bb-card-brand">' + escapeHTML(p.brand) + '</div>' +
-        '<h3 class="bb-card-name">' + escapeHTML(p.name) + '</h3>' +
-        '<p class="bb-card-desc">' + escapeHTML(p.size || '') + (p.desc ? ' · ' + escapeHTML(p.desc) : '') + '</p>' +
+        '<h3 class="bb-card-name">' + escapeHTML(productName) + '</h3>' +
+        '<p class="bb-card-desc">' + escapeHTML(p.size || '') + (productDescription ? ' · ' + escapeHTML(productDescription) : '') + '</p>' +
         '<div class="bb-card-foot">' +
           '<div class="bb-price">' + money(p.price) + (p.was ? '<s>' + money(p.was) + '</s>' : '') +
             '<span class="bb-card-desc" style="display:block;margin-top:3px">' +
-              (disabled ? 'Currently unavailable' : stockKnown ? stock + (String(p.category || '').toLowerCase().includes('wheel') ? (stock === 1 ? ' set available' : ' sets available') : (stock === 1 ? ' item available' : ' items available')) : 'Stock confirmed by shop') +
+              escapeHTML(stockText) +
             '</span></div>' +
           '<button class="bb-card-cta" type="button" data-book-product="' + escapeHTML(p.id) + '"' + (disabled ? ' disabled aria-disabled="true"' : '') + '>' +
-            (disabled ? 'Out of stock' : 'Ask about this item') +
+            translate(disabled ? 'Out of stock' : 'Ask about this item') +
             '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M5 12h14M13 5l7 7-7 7"/></svg></button>' +
         '</div>' +
       '</div></article>';
@@ -1282,27 +1458,37 @@ body[data-view="admin"] .bb-footer,body[data-view="admin"] .bb-to-top{display:no
   var host = $('#bb-products');
   var activeCategory = 'all';
   var categoryNames = ['Wheels & Tires', 'Lift Kits', 'Drop Kits'];
+  var categoryTranslations = { 'Wheels & Tires': 'Rines y llantas', 'Lift Kits': 'Kits de elevación', 'Drop Kits': 'Kits de descenso' };
   function renderCategoryOptions() {
     var filters = $('#bb-categoryFilters');
     var datalist = $('#bb-productCategoryOptions');
-    if (filters) filters.innerHTML = '<button class="bb-category-filter" type="button" data-category-filter="all" aria-pressed="' + (activeCategory === 'all') + '">All</button>' +
+    if (filters) filters.innerHTML = '<button class="bb-category-filter" type="button" data-category-filter="all" aria-pressed="' + (activeCategory === 'all') + '">' + translate('All') + '</button>' +
       categoryNames.map(function (name) {
-        return '<button class="bb-category-filter" type="button" data-category-filter="' + escapeHTML(name) + '" aria-pressed="' + (activeCategory === name) + '">' + escapeHTML(name) + '</button>';
+        return '<button class="bb-category-filter" type="button" data-category-filter="' + escapeHTML(name) + '" aria-pressed="' + (activeCategory === name) + '">' + escapeHTML(categoryLabel(name, categoryTranslations[name])) + '</button>';
       }).join('');
     if (datalist) datalist.innerHTML = categoryNames.map(function (name) { return '<option value="' + escapeHTML(name) + '">'; }).join('');
   }
   function renderProducts(products) {
     if (!host) return;
     PRODUCTS = products || [];
+    PRODUCTS.forEach(function (product) {
+      if (product.category && product.categoryEs) categoryTranslations[product.category] = product.categoryEs;
+    });
     categoryNames = Array.from(new Set(categoryNames.concat(PRODUCTS.map(function (product) { return product.category || ''; }).filter(Boolean))));
     renderCategoryOptions();
     var visibleProducts = activeCategory === 'all' ? PRODUCTS : PRODUCTS.filter(function (product) { return product.category === activeCategory; });
     host.innerHTML = visibleProducts.length ? visibleProducts.map(cardHTML).join('') :
-      '<p class="bb-admin-empty" style="grid-column:1/-1">No products available right now. Please call the shop for availability.</p>';
+      '<p class="bb-admin-empty" style="grid-column:1/-1">' + escapeHTML(translate('No products available right now. Please call the shop for availability.')) + '</p>';
   }
   function setCategories(categories) {
-    categoryNames = Array.from(new Set(['Wheels & Tires', 'Lift Kits', 'Drop Kits'].concat(categories || [],
-      PRODUCTS.map(function (product) { return product.category || ''; }).filter(Boolean))));
+    (categories || []).forEach(function (category) {
+      if (!category || !category.name) return;
+      if (category.nameEs) categoryTranslations[category.name] = category.nameEs;
+    });
+    categoryNames = Array.from(new Set(['Wheels & Tires', 'Lift Kits', 'Drop Kits'].concat(
+      (categories || []).map(function (category) { return category && category.name || ''; }).filter(Boolean),
+      PRODUCTS.map(function (product) { return product.category || ''; }).filter(Boolean)
+    )));
     renderCategoryOptions();
   }
   $('#bb-categoryFilters').addEventListener('click', function (event) {
@@ -1312,7 +1498,22 @@ body[data-view="admin"] .bb-footer,body[data-view="admin"] .bb-to-top{display:no
     renderProducts(PRODUCTS);
   });
   renderProducts(PRODUCTS);
-  win.BBApp = { renderProducts: renderProducts, setCategories: setCategories, demoProducts: PRODUCTS };
+  win.BBApp = {
+    renderProducts: renderProducts,
+    renderCategoryOptions: renderCategoryOptions,
+    setCategories: setCategories,
+    demoProducts: PRODUCTS,
+    getLanguage: function () { return language; },
+    translate: translate,
+    categoryLabel: categoryLabel,
+    spanishCategory: function (name, spanishName) { return spanishName || categoryTranslations[name] || ({ 'Wheels & Tires': 'Rines y llantas', 'Lift Kits': 'Kits de elevación', 'Drop Kits': 'Kits de descenso' }[name]) || name || ''; },
+    productText: function (product, field) {
+      if (language === 'es' && field === 'name') return product.nameEs || product.name || '';
+      if (language === 'es' && field === 'desc') return product.descEs || product.desc || '';
+      if (language === 'es' && field === 'category') return categoryLabel(product.category, product.categoryEs);
+      return product[field] || '';
+    }
+  };
 
   /* hero wheel */
   var heroWheel = $('#bb-heroWheel');
@@ -1523,6 +1724,10 @@ body[data-view="admin"] .bb-footer,body[data-view="admin"] .bb-to-top{display:no
   var year = $('#bb-year');
   if (year) year.textContent = String(new Date().getFullYear());
 
+  var languageToggle = $('#bb-languageToggle');
+  if (languageToggle) languageToggle.addEventListener('click', function () { setLanguage(language === 'en' ? 'es' : 'en'); });
+  setLanguage(language);
+
   observeReveals();
   runCounters();
   parallax();
@@ -1538,7 +1743,7 @@ body[data-view="admin"] .bb-footer,body[data-view="admin"] .bb-to-top{display:no
     appId: '1:650314143680:web:ec164b6beccdab2374da25',
     measurementId: 'G-NG15W07ZWH'
   };
-  const ADMIN_EMAIL = 'Bigboyscustoms@live.com';
+  const ADMIN_EMAIL = 'bigboys@admin.com';
   const page = document;
   const $ = (selector) => page.querySelector(selector);
   const configReady = Object.entries(FIREBASE_CONFIG).every(([key, value]) =>
@@ -1572,7 +1777,7 @@ body[data-view="admin"] .bb-footer,body[data-view="admin"] .bb-to-top{display:no
 
   function message(node, text, error) {
     if (!node) return;
-    node.textContent = text || '';
+    node.textContent = window.BBApp ? window.BBApp.translate(text || '') : (text || '');
     node.style.color = error ? 'var(--bb-red-bright)' : 'var(--bb-jade)';
   }
   function html(value) {
@@ -1638,11 +1843,11 @@ body[data-view="admin"] .bb-footer,body[data-view="admin"] .bb-to-top{display:no
     tbody.innerHTML = catalog.map((product) => {
       const inventory = inventoryById.get(product.id);
       return '<tr>' +
-        '<td><strong>' + html(product.name) + '</strong><br><span class="bb-muted">' + html(product.brand) + '</span></td>' +
-        '<td>' + html(product.sku || '—') + '<br><span class="bb-muted">' + html(product.size || product.category || '—') + '</span></td>' +
+        '<td><strong>' + html(window.BBApp.productText(product, 'name')) + '</strong><br><span class="bb-muted">' + html(product.brand) + '</span></td>' +
+        '<td>' + html(product.sku || '—') + '<br><span class="bb-muted">' + html(product.size || window.BBApp.productText(product, 'category') || '—') + '</span></td>' +
         '<td>' + money(product.price) + '</td><td>' + Math.max(0, Number(inventory && inventory.stock) || 0) + '</td>' +
-        '<td><div class="bb-admin-actions"><button type="button" data-product-action="edit" data-id="' + html(product.id) + '">Edit</button>' +
-        '<button type="button" data-product-action="delete" data-id="' + html(product.id) + '">Delete</button></div></td></tr>';
+        '<td><div class="bb-admin-actions"><button type="button" data-product-action="edit" data-id="' + html(product.id) + '">' + window.BBApp.translate('Edit') + '</button>' +
+        '<button type="button" data-product-action="delete" data-id="' + html(product.id) + '">' + window.BBApp.translate('Delete') + '</button></div></td></tr>';
     }).join('');
     if (empty) empty.hidden = catalog.length > 0;
   }
@@ -1664,19 +1869,23 @@ body[data-view="admin"] .bb-footer,body[data-view="admin"] .bb-to-top{display:no
       return '<tr><td><strong>' + html(customer.name || 'Customer') + '</strong><br>' +
         '<a href="tel:' + html(customer.phone || '') + '">' + html(customer.phone || 'No phone') + '</a><br>' +
         html(booking.year || '') + ' ' + html(booking.vehicle || '') + '</td>' +
-        '<td>' + html(booking.service || item.name || 'Booking') + (item.quantity > 1 ? ' · Qty ' + Number(item.quantity) : '') +
+        '<td>' + html(window.BBApp.translate(booking.service || (window.BBApp.getLanguage() === 'es' ? item.nameEs || item.name : item.name) || 'Booking')) + (item.quantity > 1 ? ' · ' + window.BBApp.translate('Qty') + ' ' + Number(item.quantity) : '') +
         (booking.notes ? '<br><span class="bb-muted">' + html(booking.notes) + '</span>' : '') + '</td>' +
-        '<td>' + html(booking.date || 'Not specified') + '<br>' + html(booking.time || '') + '</td>' +
-        '<td><span class="bb-admin-status">' + html(order.status || 'pending') + '</span></td>' +
+        '<td>' + html(booking.date || window.BBApp.translate('Not specified')) + '<br>' + html(window.BBApp.translate(booking.time || '')) + '</td>' +
+        '<td><span class="bb-admin-status">' + html(window.BBApp.translate(order.status || 'pending')) + '</span></td>' +
         '<td><div class="bb-admin-actions">' +
-        (order.status === 'pending' ? '<button type="button" data-order-action="confirm" data-id="' + html(order.id) + '">Confirm</button>' : '') +
-        (canSell ? '<button type="button" data-order-action="sold" data-id="' + html(order.id) + '">Mark sold</button>' : '') +
-        (order.status !== 'cancelled' && order.status !== 'sold' ? '<button type="button" data-order-action="cancel" data-id="' + html(order.id) + '">Cancel</button>' : '') +
-        '<button type="button" data-order-action="delete" data-id="' + html(order.id) + '">Delete</button>' +
+        (order.status === 'pending' ? '<button type="button" data-order-action="confirm" data-id="' + html(order.id) + '">' + window.BBApp.translate('Confirm') + '</button>' : '') +
+        (canSell ? '<button type="button" data-order-action="sold" data-id="' + html(order.id) + '">' + window.BBApp.translate('Mark sold') + '</button>' : '') +
+        (order.status !== 'cancelled' && order.status !== 'sold' ? '<button type="button" data-order-action="cancel" data-id="' + html(order.id) + '">' + window.BBApp.translate('Cancel') + '</button>' : '') +
+        '<button type="button" data-order-action="delete" data-id="' + html(order.id) + '">' + window.BBApp.translate('Delete') + '</button>' +
         '</div></td></tr>';
     }).join('');
     if (empty) empty.hidden = orders.length > 0;
   }
+  page.addEventListener('bb-language-change', () => {
+    showAdminProducts();
+    showOrders(Array.from(currentOrders.values()));
+  });
   function clearListeners() {
     if (stopOrders) stopOrders();
     if (stopInventory) stopInventory();
@@ -1691,10 +1900,15 @@ body[data-view="admin"] .bb-footer,body[data-view="admin"] .bb-to-top{display:no
     if (!productForm) return;
     const data = product || {};
     productForm.elements.namedItem('id').value = data.id || '';
-    ['name', 'brand', 'size', 'price', 'was', 'sku', 'category', 'finish', 'spokes', 'desc'].forEach((key) => {
+    ['name', 'nameEs', 'brand', 'size', 'price', 'was', 'sku', 'category', 'categoryEs', 'finish', 'spokes', 'desc', 'descEs'].forEach((key) => {
       const field = productForm.elements.namedItem(key);
-      if (field) field.value = data[key] == null ? (key === 'spokes' ? '6' : key === 'category' ? 'Wheels & Tires' : '') : data[key];
+      let value = data[key];
+      if (key === 'nameEs' && !value) value = data.name || '';
+      if (key === 'descEs' && !value) value = data.desc || '';
+      if (key === 'categoryEs' && !value) value = window.BBApp.spanishCategory(data.category || 'Wheels & Tires');
+      if (field) field.value = value == null ? (key === 'spokes' ? '6' : key === 'category' ? 'Wheels & Tires' : key === 'categoryEs' ? 'Rines y llantas' : '') : value;
     });
+    productForm.elements.namedItem('category').dataset.previousCategory = data.category || 'Wheels & Tires';
     productForm.elements.namedItem('stock').value = data.id && inventoryById.has(data.id) ?
       inventoryById.get(data.id).stock : '';
     productForm.elements.namedItem('image').value = '';
@@ -1704,7 +1918,7 @@ body[data-view="admin"] .bb-footer,body[data-view="admin"] .bb-to-top{display:no
       preview.src = data.imageData || '';
       preview.hidden = !data.imageData;
     }
-    $('#bb-productSave').textContent = data.id ? 'Save changes' : 'Add product';
+    $('#bb-productSave').textContent = window.BBApp.translate(data.id ? 'Save changes' : 'Add product');
     $('#bb-productCancel').hidden = !data.id;
   }
 
@@ -1762,10 +1976,11 @@ body[data-view="admin"] .bb-footer,body[data-view="admin"] .bb-to-top{display:no
       db = firestore.getFirestore(app);
       firebase = { ...authSdk, ...firestore };
       page.body.setAttribute('data-live', 'firebase');
+      message(setupNote, 'Firebase configuration loaded. Sign in with an authorized staff account.');
       const notice = $('#bb-demoProductNotice');
 
       firestore.onSnapshot(firestore.collection(db, 'categories'), (snapshot) => {
-        window.BBApp.setCategories(snapshot.docs.map((entry) => entry.data().name).filter(Boolean));
+        window.BBApp.setCategories(snapshot.docs.map((entry) => entry.data()).filter((category) => category.name));
       }, (error) => message($('#bb-categoryMessage'), 'Could not load categories: ' + error.message, true));
 
       stopProducts = firestore.onSnapshot(firestore.collection(db, 'products'), (snapshot) => {
@@ -1795,8 +2010,8 @@ body[data-view="admin"] .bb-footer,body[data-view="admin"] .bb-to-top{display:no
         const product = productButton ? catalog.find((item) => item.id === productButton.dataset.bookProduct) : null;
         selectedInput.value = product ? product.id : '';
         $('#bb-bookingSelected').textContent = product ?
-          product.name + ' · ' + money(product.price) + ' · stock confirmed by shop' :
-          'Tell us what you need and the shop will contact you to confirm availability.';
+          window.BBApp.productText(product, 'name') + ' · ' + money(product.price) + ' · ' + window.BBApp.translate('Stock confirmed by shop') :
+          window.BBApp.translate('Tell us what you need and the shop will contact you to confirm availability.');
         const serviceSelect = $('#bb-bookingService');
         if (product) serviceSelect.value = productService(product);
         $('#bb-bookingQuantityWrap').hidden = !product;
@@ -1839,6 +2054,7 @@ body[data-view="admin"] .bb-footer,body[data-view="admin"] .bb-to-top{display:no
             quantity: quantity,
             price: Number(product.price) || 0,
             name: product.name,
+            nameEs: product.nameEs || product.name,
             inventory: true
           } : { id: 'service-booking', quantity: 1, price: 0, name: String(values.get('service')), inventory: false };
           const notes = String(values.get('notes') || '').trim();
@@ -1867,7 +2083,7 @@ body[data-view="admin"] .bb-footer,body[data-view="admin"] .bb-to-top{display:no
           });
           bookingForm.reset();
           bookingDialog.close();
-          alert('Your request was sent. The shop will contact you to confirm your booking.');
+          alert(window.BBApp.translate('Your request was sent. The shop will contact you to confirm your booking.'));
         } catch (error) {
           message(bookingMessage, 'Booking could not be sent: ' + error.message, true);
         } finally {
@@ -1892,7 +2108,7 @@ body[data-view="admin"] .bb-footer,body[data-view="admin"] .bb-to-top{display:no
           const hasClaim = token.claims.admin === true || token.claims.role === 'admin';
           if (!hasClaim && !['owner', 'admin', 'staff'].includes(role)) {
             await firebase.signOut(auth);
-            throw new Error('This account is not authorized for the staff dashboard. Ask the owner to grant staff access.');
+            throw new Error('Signed in as ' + credential.user.email + ', but staff access is not assigned. In this Firebase project, create admins/' + credential.user.uid + ' with role "owner" and the same email.');
           }
           setAdminVisible(true);
           message(loginMessage, '');
@@ -1906,14 +2122,16 @@ body[data-view="admin"] .bb-footer,body[data-view="admin"] .bb-to-top{display:no
 
       categoryForm.addEventListener('submit', async (event) => {
         event.preventDefault();
-        const name = String(new FormData(categoryForm).get('name') || '').trim();
+        const categoryValues = new FormData(categoryForm);
+        const name = String(categoryValues.get('name') || '').trim();
+        const nameEs = String(categoryValues.get('nameEs') || '').trim();
         const id = slug(name);
-        if (!id) {
+        if (!id || !nameEs) {
           message($('#bb-categoryMessage'), 'Enter a category name using letters or numbers.', true);
           return;
         }
         try {
-          await firebase.setDoc(firebase.doc(db, 'categories', id), { name: name, updatedAt: firebase.serverTimestamp() }, { merge: true });
+          await firebase.setDoc(firebase.doc(db, 'categories', id), { name: name, nameEs: nameEs, updatedAt: firebase.serverTimestamp() }, { merge: true });
           categoryForm.reset();
           message($('#bb-categoryMessage'), 'Category saved.');
         } catch (error) {
@@ -1935,31 +2153,50 @@ body[data-view="admin"] .bb-footer,body[data-view="admin"] .bb-to-top{display:no
         preview.hidden = false;
       });
 
+      $('#bb-productCategory').addEventListener('change', (event) => {
+        const category = event.target.value.trim();
+        const spanishField = $('#bb-productCategoryEs');
+        const previousEnglish = event.target.dataset.previousCategory || 'Wheels & Tires';
+        const previousSpanish = window.BBApp.spanishCategory(previousEnglish);
+        if (spanishField && (!spanishField.value.trim() || spanishField.value.trim() === previousSpanish)) {
+          spanishField.value = window.BBApp.spanishCategory(category);
+        }
+        event.target.dataset.previousCategory = category;
+      });
+
       productForm.addEventListener('submit', async (event) => {
         event.preventDefault();
         const values = new FormData(productForm);
         const name = String(values.get('name') || '').trim();
+        const nameEs = String(values.get('nameEs') || '').trim();
+        const category = String(values.get('category') || '').trim();
+        const categoryEs = String(values.get('categoryEs') || '').trim();
+        const description = String(values.get('desc') || '').trim();
+        const descriptionEs = String(values.get('descEs') || '').trim();
         const price = Number(values.get('price'));
         const was = values.get('was') === '' ? 0 : Number(values.get('was'));
         const stock = Number(values.get('stock'));
         const spokes = Number(values.get('spokes'));
-        if (!name || !Number.isFinite(price) || price < 0 || price > 500000 || !Number.isFinite(was) || was < 0 || was > 500000 ||
+        if (!name || !nameEs || !category || !categoryEs || Boolean(description) !== Boolean(descriptionEs) || !Number.isFinite(price) || price < 0 || price > 500000 || !Number.isFinite(was) || was < 0 || was > 500000 ||
             !Number.isInteger(stock) || stock < 0 || !Number.isInteger(spokes) || spokes < 3 || spokes > 16) {
-          message($('#bb-productMessage'), 'Check the name, price, stock quantity, and spoke count.', true);
+          message($('#bb-productMessage'), Boolean(description) !== Boolean(descriptionEs) ? 'Write descriptions in both languages or leave both blank.' : 'Check the name, price, stock quantity, and spoke count.', true);
           return;
         }
         const id = String(values.get('id') || '') || (slug(name) + '-' + Date.now().toString(36));
         const product = {
           name: name,
+          nameEs: nameEs,
           brand: String(values.get('brand') || '').trim(),
           size: String(values.get('size') || '').trim(),
           price: price,
           was: was,
           sku: String(values.get('sku') || '').trim(),
-          category: String(values.get('category') || 'Wheels'),
+          category: category,
+          categoryEs: categoryEs,
           finish: String(values.get('finish') || 'chrome'),
           spokes: spokes,
-          desc: String(values.get('desc') || '').trim(),
+          desc: description,
+          descEs: descriptionEs,
           updatedAt: firebase.serverTimestamp()
         };
         try {
@@ -1988,7 +2225,7 @@ body[data-view="admin"] .bb-footer,body[data-view="admin"] .bb-to-top{display:no
           productForm.scrollIntoView({ behavior: 'smooth', block: 'center' });
           return;
         }
-        if (!confirm('Delete "' + product.name + '" from the catalogue? Existing bookings will remain.')) return;
+        if (!confirm(window.BBApp.translate('Delete') + ' "' + window.BBApp.productText(product, 'name') + '" from the catalogue? Existing bookings will remain.')) return;
         try {
           const batch = firebase.writeBatch(db);
           batch.delete(firebase.doc(db, 'products', product.id));

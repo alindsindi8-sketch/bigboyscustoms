@@ -160,6 +160,16 @@ service cloud.firestore {
       // Exact inventory counts belong only in the private inventory collection.
       allow create, update: if isStaff() &&
         !('stock' in request.resource.data) &&
+        request.resource.data.nameEs is string &&
+        request.resource.data.nameEs.size() > 0 &&
+        request.resource.data.nameEs.size() <= 120 &&
+        request.resource.data.categoryEs is string &&
+        request.resource.data.categoryEs.size() > 0 &&
+        request.resource.data.categoryEs.size() <= 60 &&
+        request.resource.data.desc is string &&
+        request.resource.data.desc.size() <= 500 &&
+        request.resource.data.descEs is string &&
+        request.resource.data.descEs.size() <= 500 &&
         (!('imageData' in request.resource.data) ||
           (request.resource.data.imageData is string && request.resource.data.imageData.size() <= 850000));
       allow delete: if isStaff();
@@ -172,7 +182,10 @@ service cloud.firestore {
       allow create, update: if isStaff() &&
         request.resource.data.name is string &&
         request.resource.data.name.size() > 0 &&
-        request.resource.data.name.size() <= 60;
+        request.resource.data.name.size() <= 60 &&
+        request.resource.data.nameEs is string &&
+        request.resource.data.nameEs.size() > 0 &&
+        request.resource.data.nameEs.size() <= 60;
       allow delete: if isStaff();
     }
 

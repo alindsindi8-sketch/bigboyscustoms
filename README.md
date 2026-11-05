@@ -103,8 +103,8 @@ Create and update these collections through the site:
 1. Console → **Build → Authentication → Get started**.
 2. **Sign-in method** tab → **Email/Password** → enable → Save.
    No other provider is used by this site.
-3. Create the admin account in **Users** → **Add user** using the shop email
-   `Bigboyscustoms@live.com`. Passwords are never stored in the website code.
+3. Create the admin account in **Users** → **Add user** using
+   `bigboys@admin.com`. Passwords are never stored in the website code.
 4. **Settings** tab → **Authorized domains**: add your `*.vercel.app` domain and your
    custom domain when you have them. `localhost` is there already.
 5. Leave "Email link / Google / Anonymous" off — this dashboard is staff-only and
@@ -197,9 +197,10 @@ published:
   desired product or service, preferred date/time, and notes.
 * Staff open the **Staff sign in** link in the footer (or visit `/#admin`) and sign in
   with Firebase Email/Password. Only an authorized staff account can read booking data.
-* Staff can add categories and products, including Wheels & Tires, Lift Kits, and Drop
-   Kits; product photos are stored in Firestore without Firebase Storage. Shop cards show
-   the live stock count and can be filtered by category.
+* Staff can add categories and products in English and Spanish, including Wheels & Tires,
+   Lift Kits, and Drop Kits. Visitors can switch languages with the globe button; product
+   photos are stored in Firestore without Firebase Storage. Shop cards show live stock and
+   can be filtered by category.
 * Staff can confirm, cancel, delete, or mark a booking sold. Marking a product booking
   sold decrements the product stock in the same Firestore transaction as the status
   change, so the two changes succeed or fail together.
