@@ -1,1 +1,256 @@
-# bigboyscustoms
+# BIGBOYS CUSTOMS — Custom Wheels & Tires
+
+**"We are your one stop shop."** · 3100 Mansfield Hwy, Forest Hill, TX 76119 · **817-535-2284** · OPEN 7 DAYS A WEEK
+Email **Bigboyscustoms@live.com** · [Instagram](https://www.instagram.com/bigboyscustoms/) ·
+[TikTok](https://www.tiktok.com/@bigboyscustoms) · [YouTube](https://www.youtube.com/@bigboyscustoms)
+
+This workspace currently runs as one `index.html` file with hash-based Home, Shop,
+Services, Why Us, Contact, and Staff Dashboard views. It includes a customer booking
+form and Firebase-backed product, booking, and stock-management code.
+
+**Firebase is not configured in this copy yet.** The public web config values in the
+inline `FIREBASE_CONFIG` object in `index.html` are blank. Until those are supplied and
+the Firestore rules below are published, the shop shows preview products, booking
+submissions are not stored, and staff sign-in stays disabled. Do not treat preview
+inventory as live stock.
+
+The site uses **HTML, CSS, vanilla JavaScript, and Firebase** and can be served as static
+files; the local server is for preview only.
+
+---
+
+## Contents
+
+1. [Running it right now (nothing to install)](#1-vs-code--run-it-in-30-seconds)
+2. [Create the Firebase project](#2-create-the-firebase-project)
+3. [Enable Firestore](#3-enable-cloud-firestore)
+4. [Enable Authentication](#4-enable-authentication)
+5. [Product photos (no Storage needed)](#5-product-photos-no-storage-needed)
+6. [Give yourself admin access — securely](#6-configure-admin-access-securely)
+7. [Deploy to Vercel (free)](#7-deploy-to-vercel-free)
+8. [Connect your custom domain](#8-connect-a-custom-domain)
+* [Preview mode and staff dashboard](#preview-mode-and-staff-dashboard) · [Payments and customer data](#payments-and-customer-data) · [Current files](#current-files) · [Troubleshooting](#troubleshooting) · [Security rules](#security-rules)
+
+---
+
+## 1. VS Code — run it in 30 seconds
+
+1. Install [VS Code](https://code.visualstudio.com/).
+2. In VS Code: **File → Open Folder…** and pick the `big boys` folder.
+3. Install the **Live Server** extension (Extensions sidebar → search `Live Server`,
+   author *Ritwick Dey* → Install).
+4. Right-click `index.html` in the Explorer → **Open with Live Server**.
+
+You get `http://127.0.0.1:5500/index.html`. Staff sign-in is at `/#admin`.
+
+Two things to know while developing:
+
+* **Use a server, not `file://`.** Firebase SDK modules are loaded with
+  `import()`, which browsers refuse to run from a `file://` page. Live Server,
+  `npx serve`, or `python -m http.server` all work; opening the HTML by double-clicking
+  shows the site but not the live-data features.
+* **Before setup:** sample cards display a Demo badge; the booking form explains that
+  nothing is stored until Firebase is connected.
+
+## 2. Create the Firebase project
+
+1. Go to <https://console.firebase.google.com/> → **Add project**.
+2. Name it `bigboys-customs`. Google Analytics is optional (skip it).
+3. When the project opens, press the **`</>` (Web)** button and register an app named
+   `bigboys-web`. **Do not** tick "Firebase Hosting" — Vercel serves the site.
+4. Firebase now shows a `firebaseConfig` object with ~7 string values. Copy it and paste
+   it into the `FIREBASE_CONFIG` object in `index.html`. Those values are public by design (they identify your
+   project). The thing you must never paste here is a **service account key** — see
+   [Security rules](#security-rules).
+5. In `index.html`, find the inline `FIREBASE_CONFIG` object near the bottom and paste
+   the Firebase Web app values into its fields. `storageBucket` is optional and may stay
+   blank because this site does not use Firebase Storage:
+
+   ```js
+   const FIREBASE_CONFIG = {
+     apiKey: '...',
+     authDomain: '...',
+     projectId: '...',
+     storageBucket: '...',
+     messagingSenderId: '...',
+     appId: '...'
+   };
+   ```
+
+   The Firebase Web config is public project-identification data. Never put a password,
+   service-account key, private token, or admin credential in the page.
+
+## 3. Enable Cloud Firestore
+
+1. Console left sidebar → **Build → Firestore Database → Create database**.
+2. Region: **`us-central`** or the closest to Texas (`us-east1` is a good pick).
+3. Start in **production mode** (locked). The rules in
+   [`firebase-rules.md`](firebase-rules.md) allow public catalogue reads and booking
+   submissions, while protecting customer bookings and exact stock counts.
+
+Create and update these collections through the site:
+
+| collection | what lands in it |
+| --- | --- |
+| `products` | public product details, without exact stock counts |
+| `categories` | shop categories such as Wheels & Tires, Lift Kits, and Drop Kits |
+| `inventory` | exact stock counts, readable and writable only by authorized staff |
+| `orders` | booking requests, starting at `pending`; private to staff for reading |
+| `admins` | `{your-uid}` with `role: "owner"` |
+
+## 4. Enable Authentication
+
+1. Console → **Build → Authentication → Get started**.
+2. **Sign-in method** tab → **Email/Password** → enable → Save.
+   No other provider is used by this site.
+3. Create the admin account in **Users** → **Add user** using the shop email
+   `Bigboyscustoms@live.com`. Passwords are never stored in the website code.
+4. **Settings** tab → **Authorized domains**: add your `*.vercel.app` domain and your
+   custom domain when you have them. `localhost` is there already.
+5. Leave "Email link / Google / Anonymous" off — this dashboard is staff-only and
+   customers never create accounts.
+
+## 5. Product photos (no Storage needed)
+
+The admin can upload a product photo without enabling Firebase Storage. The browser
+resizes it, compresses it to JPEG (maximum 600 KB), and stores it in the public
+Firestore product document. Keep photos reasonably sized; Firestore documents have a
+1 MiB maximum. The built-in wheel artwork remains the fallback when a product has no
+photo.
+
+## 6. Configure admin access securely
+
+Firestore rules protect the data even if someone bypasses the website UI. Two approved
+ways to grant staff access are supported:
+
+**A. Custom claim — recommended.** Console → **Authentication → Users** → open yourself
+→ ⋮ → **Edit claims** → paste:
+
+```json
+{ "admin": true }
+```
+
+Save, then **sign out and sign back in** — the claim is baked into the ID token at
+sign-in, so an already-open tab keeps its old token.
+
+**B. Role document** — Firestore → `admins` collection → **Add document** with Document
+ID equal to your UID (Authentication → Users → *UID*) and fields `email` (string) and
+`role` (string `owner`). Staff accounts must also be explicitly granted a staff role in
+this collection or via a custom claim. The website itself cannot grant admin privileges.
+
+Now publish [`firebase-rules.md`](firebase-rules.md) §3 into Firestore → Rules →
+**Publish**. Finally run the verification checks in its §8 — the console's editor will
+happily save rules that are wrong, so the only real proof is behaviour.
+
+## 7. Deploy to Vercel free
+
+Option 1 — dashboard (no local tooling):
+
+1. <https://vercel.com/new> on its own is fine: choose **Import a repository**, or
+2. drag the `big boys` folder up as a project after pushing it to GitHub — the cleanest
+   long-term path is GitHub → Vercel, so every future edit is a `git push`.
+
+Option 2 — from your machine:
+
+```
+npm i -g vercel
+cd "C:/Users/judi/Desktop/big boys"
+vercel
+```
+
+Answer the prompts: link to your account, project name `bigboys-customs`, framework
+preset **Other**, everything else **Enter** (no build command, no install, output
+directory `.`). Run `vercel` again later for a preview, `vercel --prod` to publish.
+
+No build step exists. Keep `bg.mp4` next to `index.html`. [`vercel.json`](vercel.json) only sets cache
+headers and clean URLs; deleting the file is harmless.
+
+Then finish the loop: Firebase → Authentication → Settings → **Authorized domains** →
+add `your-app.vercel.app`.
+
+## 8. Connect a custom domain
+
+1. Vercel dashboard → your project → **Settings → Domains → Add**.
+2. Type `bigboyscustoms.com` (it offers `www.` too).
+3. Vercel shows two/three DNS records. In your registrar (GoDaddy, Namecheap, Cloudflare)
+   add them: `A  76.76.21.21` for the apex, `CNAME  cname.vercel-dns.com` for `www`.
+   A Cloudflare proxy must be set to **DNS only** — an orange-cloud proxy breaks the
+   Vercel certificate.
+4. Wait for **Valid configuration** (often 5–20 minutes, occasionally up to a day).
+   Vercel issues the SSL certificate automatically; HTTP redirects to HTTPS by itself.
+5. Set the domain you want as canonical (Vercel offers a redirect toggle).
+6. Back in Firebase: add the new domain to **Authorized domains**.
+
+---
+
+## Preview mode and staff dashboard
+
+Before Firebase is configured, the shop displays four clearly marked sample products.
+The booking form does not store or send customer information, and staff sign-in is
+disabled. This is intentional: browser-only storage would not be private or shared with
+the admin.
+
+After Firebase is configured and the Firestore rules in `firebase-rules.md` are
+published:
+
+* Customers can submit booking requests with contact details, vehicle information,
+  desired product or service, preferred date/time, and notes.
+* Staff open the **Staff sign in** link in the footer (or visit `/#admin`) and sign in
+  with Firebase Email/Password. Only an authorized staff account can read booking data.
+* Staff can add categories and products, including Wheels & Tires, Lift Kits, and Drop
+   Kits; product photos are stored in Firestore without Firebase Storage. Shop cards show
+   the live stock count and can be filtered by category.
+* Staff can confirm, cancel, delete, or mark a booking sold. Marking a product booking
+  sold decrements the product stock in the same Firestore transaction as the status
+  change, so the two changes succeed or fail together.
+* The dashboard is responsive on mobile; its tables can scroll horizontally when
+  necessary.
+
+The first owner must be authorized in Firebase before signing in: either set the
+`admin: true` custom claim on the Firebase Auth user, or create the matching
+`admins/{uid}` document with `role: "owner"`. Publish the rules before accepting real
+bookings; the rules keep booking reads and inventory writes staff-only.
+
+## Payments and customer data
+
+The booking form is a request only; it does not charge a customer or reserve stock.
+Staff confirm availability and price directly. Customer contact and vehicle details
+are written to the private `orders` collection only after Firebase is configured.
+Do not use the site for real bookings until the rules are published and tested.
+
+## Current files
+
+```
+big boys/
+├── index.html         storefront, page views, booking form, staff dashboard
+├── bg.mp4             home hero background video (keep beside index.html)
+├── firebase-rules.md  Firestore security rules to publish
+├── vercel.json        static hosting headers
+├── style.css          legacy stylesheet (not loaded by the current page)
+├── animations.css     legacy stylesheet (not loaded by the current page)
+└── README.md          setup and usage
+```
+
+The wheel illustrations, page styles, animations, Firebase SDK integration, and page
+logic are embedded in `index.html`. The video is the one required adjacent asset; it is
+played muted and looped behind the home hero.
+
+## Troubleshooting
+
+| Symptom | Cause and fix |
+| --- | --- |
+| Booking form says Firebase is not connected | Add the Web config values to the inline `FIREBASE_CONFIG` object in `index.html`; `storageBucket` may stay blank. |
+| Firebase cannot start after paste | Check for a missing quote or comma in the config object and compare its values with the Firebase console. |
+| Staff sign-in is denied | Grant the Firebase Auth UID an admin claim or a matching `admins/{uid}` role document, and publish the Firestore rules. |
+| Shop has no products after Firebase is connected | Add products in `/#admin` after signing in; preview inventory is not copied into Firestore. |
+| Booking submit is denied | Confirm Firestore rules §3 are published and the booking form includes valid customer and vehicle information. |
+| Mobile menu or animation janky on an old phone | The site honours `prefers-reduced-motion`; enable that OS setting to confirm the layout still reads correctly without motion. |
+
+## Security rules
+
+Read [`firebase-rules.md`](firebase-rules.md) before you tell anyone the site is live.
+It contains the publishable Firestore rules, the reasoning behind each one,
+the first-admin bootstrap, how to deploy rules from the CLI, checks that prove
+enforcement by effect rather than by reading the console, and the credentials checklist
+(nothing like a service account key belongs in this folder — there is no backend here
+that could keep it secret).

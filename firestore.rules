@@ -1,0 +1,129 @@
+rules_version = '2';
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+    function signedIn() {
+      return request.auth != null;
+    }
+
+    function hasAdminClaim() {
+      return signedIn() &&
+        (request.auth.token.admin == true ||
+         request.auth.token.role == 'admin');
+    }
+
+    function adminPath() {
+      return /databases/$(database)/documents/admins/$(request.auth.uid);
+    }
+
+    function hasAdminDoc() {
+      return signedIn() && exists(adminPath());
+    }
+
+    function adminRole() {
+      return get(adminPath()).data.role;
+    }
+
+    function isStaff() {
+      return hasAdminClaim() ||
+        (hasAdminDoc() && adminRole() in ['owner', 'admin', 'staff']);
+    }
+
+    function isOwner() {
+      return hasAdminClaim() ||
+        (hasAdminDoc() && adminRole() == 'owner');
+    }
+
+    function validOrder() {
+      let order = request.resource.data;
+      return order.status == 'pending' &&
+        order.items is list &&
+        order.items.size() == 1 &&
+        order.items[0].id is string &&
+        order.items[0].id.size() > 0 &&
+        order.items[0].id.size() <= 120 &&
+        order.items[0].quantity is int &&
+        order.items[0].quantity > 0 &&
+        order.items[0].quantity <= 99 &&
+        order.items[0].price is number &&
+        order.items[0].price >= 0 &&
+        order.items[0].price <= 500000 &&
+        order.customer is map &&
+        order.customer.name is string &&
+        order.customer.name.size() > 1 &&
+        order.customer.name.size() <= 120 &&
+        order.customer.phone is string &&
+        order.customer.phone.size() <= 40 &&
+        order.customer.email is string &&
+        order.customer.email.size() <= 160 &&
+        order.booking is map &&
+        order.booking.service is string &&
+        order.booking.service.size() > 0 &&
+        order.booking.service.size() <= 80 &&
+        order.booking.year is string &&
+        order.booking.year.size() == 4 &&
+        order.booking.vehicle is string &&
+        order.booking.vehicle.size() <= 100 &&
+        order.booking.date is string &&
+        order.booking.date.size() <= 10 &&
+        order.booking.time is string &&
+        order.booking.time.size() <= 40 &&
+        order.booking.notes is string &&
+        order.booking.notes.size() <= 1500 &&
+        order.subtotal is number &&
+        order.tax is number &&
+        order.total is number &&
+        order.subtotal >= 0 &&
+        order.tax >= 0 &&
+        order.total >= 0;
+    }
+
+    match /products/{productId} {
+      allow read: if true;
+      allow create, update: if isStaff() &&
+        !('stock' in request.resource.data) &&
+        (!('imageData' in request.resource.data) ||
+          (request.resource.data.imageData is string &&
+           request.resource.data.imageData.size() <= 850000));
+      allow delete: if isStaff();
+    }
+
+    match /categories/{categoryId} {
+      allow read: if true;
+      allow create, update: if isStaff() &&
+        request.resource.data.name is string &&
+        request.resource.data.name.size() > 0 &&
+        request.resource.data.name.size() <= 60;
+      allow delete: if isStaff();
+    }
+
+    match /inventory/{productId} {
+      allow read: if isStaff();
+      allow create, update: if isStaff() &&
+        request.resource.data.stock is int &&
+        request.resource.data.stock >= 0 &&
+        request.resource.data.stock <= 1000000;
+      allow delete: if isStaff();
+    }
+
+    match /orders/{orderId} {
+      allow read: if isStaff();
+      allow create: if validOrder();
+      allow update, delete: if isStaff();
+    }
+
+    match /admins/{uid} {
+      allow get: if signedIn() &&
+        (request.auth.uid == uid || isOwner());
+      allow list: if isOwner();
+      allow create, update: if isOwner() &&
+        request.resource.data.role in ['owner', 'admin', 'staff'] &&
+        request.resource.data.email is string;
+      allow delete: if isOwner();
+    }
+
+    match /{document=**} {
+      allow read, write: if false;
+    }
+  }
+}

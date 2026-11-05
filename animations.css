@@ -1,0 +1,338 @@
+/* ==========================================================================
+   BIGBOYS CUSTOMS — Motion & Animation Layer
+   File: assets/css/animations.css
+   Principle: motion is triggered by scroll, page entry or pointer interaction.
+   Resting visuals stay still (no idle drift / breathing) and everything here
+   respects prefers-reduced-motion.
+   ========================================================================== */
+
+/* --------------------------------------------------------------------------
+   1. SCROLL REVEAL
+   -------------------------------------------------------------------------- */
+.bb-reveal {
+  opacity: 0;
+  transform: translateY(34px);
+  transition:
+    opacity 0.8s var(--bb-ease),
+    transform 0.8s var(--bb-ease),
+    filter 0.8s var(--bb-ease);
+  filter: blur(4px);
+  will-change: opacity, transform;
+}
+.bb-reveal.bb-reveal-left { transform: translateX(-46px); }
+.bb-reveal.bb-reveal-right { transform: translateX(46px); }
+.bb-reveal.bb-reveal-zoom { transform: scale(0.92); }
+.bb-reveal.bb-reveal-down { transform: translateY(-34px); }
+.bb-reveal.in-view {
+  opacity: 1;
+  transform: none;
+  filter: blur(0);
+}
+/* stagger children of a revealed container (grid/flex lists) */
+.bb-stagger > * {
+  opacity: 0;
+  transform: translateY(30px);
+  transition: opacity 0.7s var(--bb-ease), transform 0.7s var(--bb-ease);
+}
+.bb-stagger.in-view > * { opacity: 1; transform: none; }
+.bb-stagger.in-view > *:nth-child(1) { transition-delay: 0.04s; }
+.bb-stagger.in-view > *:nth-child(2) { transition-delay: 0.10s; }
+.bb-stagger.in-view > *:nth-child(3) { transition-delay: 0.16s; }
+.bb-stagger.in-view > *:nth-child(4) { transition-delay: 0.22s; }
+.bb-stagger.in-view > *:nth-child(5) { transition-delay: 0.28s; }
+.bb-stagger.in-view > *:nth-child(6) { transition-delay: 0.34s; }
+.bb-stagger.in-view > *:nth-child(7) { transition-delay: 0.40s; }
+.bb-stagger.in-view > *:nth-child(8) { transition-delay: 0.46s; }
+.bb-stagger.in-view > *:nth-child(n + 9) { transition-delay: 0.52s; }
+
+/* --------------------------------------------------------------------------
+   2. HERO ENTRANCE CHOREOGRAPHY
+   -------------------------------------------------------------------------- */
+.bb-reveal-block {
+  opacity: 0;
+  transform: translateY(26px);
+  transition: opacity 0.75s var(--bb-ease), transform 0.75s var(--bb-ease);
+}
+.bb-hero.in .bb-reveal-block,
+.bb-enter.in .bb-reveal-block { opacity: 1; transform: none; }
+.bb-delay-1 { transition-delay: 0.10s; }
+.bb-delay-2 { transition-delay: 0.22s; }
+.bb-delay-3 { transition-delay: 0.34s; }
+.bb-delay-4 { transition-delay: 0.46s; }
+.bb-delay-5 { transition-delay: 0.58s; }
+
+/* masked line reveal: each word sits in a clipping box and rises into place */
+.bb-line-mask { display: block; overflow: hidden; padding-bottom: 0.06em; }
+.bb-line-mask > span {
+  display: inline-block;
+  transform: translateY(112%);
+  transition: transform 0.9s var(--bb-ease);
+  transition-delay: var(--bb-word-delay, 0s);
+}
+.bb-hero.in .bb-line-mask > span,
+.bb-enter.in .bb-line-mask > span { transform: translateY(0); }
+
+/* metal wipe used on the big hero headline.
+   data-split-words rewrites the h1 as .bb-line-mask > span, and Chrome only
+   clips a background to the text that sits directly in the element carrying
+   background-clip — so the gradient is declared on the word span as well as
+   on the heading itself (the heading keeps it for un-split fallback text). */
+.bb-wipe {
+  --bb-metal: linear-gradient(100deg,
+      #6c737f 0%, #dfe4ec 18%, #ffffff 30%,
+      #9aa2af 46%, #eef1f6 62%, #7f8693 82%, #c6ccd6 100%);
+  background-image: var(--bb-metal);
+  background-size: 260% 100%;
+  background-position: 118% 0;
+  -webkit-background-clip: text; background-clip: text;
+  -webkit-text-fill-color: transparent; color: transparent;
+  transition: background-position 1.5s var(--bb-ease-in-out) 0.25s;
+}
+/* background-image:inherit resolves to none here, so the custom property —
+   which does inherit — carries the gradient down to the word span. */
+.bb-wipe .bb-line-mask > span {
+  background-image: var(--bb-metal);
+  background-size: 260% 100%;
+  background-position: inherit;
+  -webkit-background-clip: text; background-clip: text;
+  -webkit-text-fill-color: transparent; color: transparent;
+  transition: background-position 1.5s var(--bb-ease-in-out) 0.25s;
+}
+.bb-hero.in .bb-wipe,
+.bb-enter.in .bb-wipe,
+.bb-hero.in .bb-wipe .bb-line-mask > span,
+.bb-enter.in .bb-wipe .bb-line-mask > span { background-position: -18% 0; }
+
+/* red underline that draws itself */
+.bb-rule-draw {
+  height: 3px; width: 0; border-radius: 3px;
+  background: linear-gradient(90deg, var(--bb-red-bright), var(--bb-red-deep) 70%, transparent);
+  transition: width 1.1s var(--bb-ease) 0.5s;
+}
+.in .bb-rule-draw,
+.bb-rule-draw.in-view { width: 168px; }
+
+/* --------------------------------------------------------------------------
+   3. LOADER + FIRST-VISIT INTRO
+   -------------------------------------------------------------------------- */
+/* every other page: the lockup simply rises and settles */
+.bb-loader-mark .bb-logo-img { animation: bbLogoIn 0.9s var(--bb-ease-out) both; }
+
+/* home page first visit: bloom, shine sweep, letter build, then hand off */
+.bb-intro-rays { animation: bbRays 14s linear infinite; }
+@keyframes bbRays { to { transform: rotate(360deg); } }
+
+.bb-intro-logo .bb-logo-img {
+  opacity: 0; transform: scale(0.82);
+  animation: bbLogoIn 1.05s var(--bb-ease-out) 0.12s forwards;
+}
+@keyframes bbLogoIn {
+  0% { opacity: 0; transform: scale(0.82) translateY(14px); filter: blur(14px) drop-shadow(0 0 0 transparent); }
+  60% { opacity: 1; filter: blur(0) drop-shadow(0 10px 26px rgba(90, 208, 127, 0.35)); }
+  100% { opacity: 1; transform: scale(1) translateY(0); filter: blur(0) drop-shadow(0 22px 44px rgba(0, 0, 0, 0.7)); }
+}
+
+.bb-intro-bloom { opacity: 0; animation: bbBloom 1.6s var(--bb-ease) 0.25s forwards; }
+@keyframes bbBloom { 0% { opacity: 0; transform: scale(0.7); } 55% { opacity: 1; } 100% { opacity: 0.72; transform: scale(1); } }
+
+.bb-intro-shine::before { animation: bbShine 1.5s var(--bb-ease-out) 0.85s 1 forwards; }
+@keyframes bbShine { to { transform: rotate(12deg) translateX(420%); } }
+/* the blend layer leaves a faint rectangular edge over the artwork once the
+   band has passed, so it bows out with the sweep */
+.bb-intro-shine { animation: bbShineOff 0.3s linear 2.1s forwards; }
+@keyframes bbShineOff { to { opacity: 0; } }
+
+.bb-intro-word span {
+  opacity: 0; transform: translateY(16px);
+  animation: bbLetter 0.5s var(--bb-ease-out) both;
+}
+@keyframes bbLetter { to { opacity: 1; transform: translateY(0); } }
+
+.bb-intro-tag { opacity: 0; animation: bbFadeUp 0.7s var(--bb-ease-out) 1.35s forwards; }
+.bb-intro-meta { opacity: 0; animation: bbFadeUp 0.6s ease 1.5s forwards; }
+@keyframes bbFadeUp { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+
+.bb-intro-bar i { animation: bbLoad 1.5s var(--bb-ease-out) 0.3s forwards; }
+@keyframes bbLoad { to { width: 100%; } }
+
+/* exit: the whole screen lifts away rather than just cutting */
+#bb-loader.bb-intro.bb-loader-hidden { animation: bbIntroOut 0.62s var(--bb-ease) forwards; }
+@keyframes bbIntroOut {
+  0% { opacity: 1; transform: scale(1); }
+  100% { opacity: 0; transform: scale(1.14); filter: blur(6px); }
+}
+
+/* nav / footer logo: still at rest, breathes a little on hover */
+.bb-logo-mark .bb-logo-img { transition: transform 0.5s var(--bb-ease); }
+.bb-logo:hover .bb-logo-mark .bb-logo-img { transform: scale(1.05); }
+
+@keyframes bbDraw { to { stroke-dashoffset: 0; } }
+@keyframes bbSpinFast { to { transform: rotate(360deg); } }
+
+/* --------------------------------------------------------------------------
+   4. PARALLAX LAYERS
+   -------------------------------------------------------------------------- */
+.bb-parallax { will-change: transform; }
+.bb-parallax-bg { transform: translate3d(0, calc(var(--bb-py, 0) * 1px), 0); }
+.bb-parallax-mid { transform: translate3d(0, calc(var(--bb-py, 0) * 0.45px), 0); }
+.bb-parallax-fast { transform: translate3d(0, calc(var(--bb-py, 0) * -0.28px), 0); }
+
+/* hero art responds to pointer (damped, only while the pointer moves) */
+.bb-tilt-layer {
+  transform: translate3d(calc(var(--bb-px, 0) * 18px), calc(var(--bb-py2, 0) * 12px), 0);
+  transition: transform 0.4s var(--bb-ease);
+}
+
+/* --------------------------------------------------------------------------
+   5. PRODUCT MEDIA MOTION
+   -------------------------------------------------------------------------- */
+/* lift + micro-rotation applied on hover only, never on rest */
+.bb-float-card {
+  transition: transform 0.55s var(--bb-ease), box-shadow 0.55s var(--bb-ease);
+}
+.bb-float-card:hover {
+  transform: translateY(-14px) perspective(900px) rotateX(2.4deg) rotateY(-2.4deg);
+  box-shadow: var(--bb-shadow-lg);
+}
+
+/* wheel spin driven by hover / focus, with a braked stop */
+.bb-spin-on-hover { transform-origin: 50% 50%; transition: transform 0.9s var(--bb-ease); }
+*:hover > .bb-spin-on-hover,
+.bb-spin-on-hover.bb-spinning { animation: bbSpinSteady 3.2s linear infinite; }
+@keyframes bbSpinSteady { to { transform: rotate(360deg); } }
+
+/* image zoom frame */
+.bb-zoom-frame { overflow: hidden; }
+.bb-zoom-frame img, .bb-zoom-frame svg { transition: transform 1.1s var(--bb-ease); }
+.bb-zoom-frame:hover img, .bb-zoom-frame:hover svg { transform: scale(1.08); }
+
+/* gloss pass across product media on hover */
+.bb-product-media::after {
+  content: ""; position: absolute; inset: 0; pointer-events: none;
+  background: linear-gradient(115deg, transparent 34%, rgba(255, 255, 255, 0.18) 46%, transparent 58%);
+  background-size: 250% 100%; background-position: 160% 0;
+  transition: background-position 0.9s var(--bb-ease);
+}
+.bb-product-card:hover .bb-product-media::after { background-position: -60% 0; }
+
+/* --------------------------------------------------------------------------
+   6. BUTTON / MICRO INTERACTIONS
+   -------------------------------------------------------------------------- */
+.bb-btn .bb-btn-label { position: relative; display: inline-block; }
+.bb-btn-arrow svg { transition: transform 0.35s var(--bb-ease); }
+.bb-btn-arrow:hover svg { transform: translateX(6px); }
+.bb-press:active { transform: scale(0.97); }
+
+.bb-count-up { font-variant-numeric: tabular-nums; }
+
+/* underline sweep on section titles */
+.bb-title-sweep { position: relative; display: inline-block; }
+.bb-title-sweep::after {
+  content: ""; position: absolute; left: 0; bottom: -10px;
+  width: 100%; height: 2px; transform: scaleX(0); transform-origin: left;
+  background: linear-gradient(90deg, var(--bb-red), transparent);
+  transition: transform 0.9s var(--bb-ease) 0.15s;
+}
+.bb-title-sweep.in-view::after { transform: scaleX(1); }
+
+/* --------------------------------------------------------------------------
+   7. BRAND MARQUEE
+   -------------------------------------------------------------------------- */
+.bb-marquee { position: relative; overflow: hidden; padding-block: 22px; }
+.bb-marquee::before, .bb-marquee::after {
+  content: ""; position: absolute; top: 0; bottom: 0; width: 120px; z-index: 2; pointer-events: none;
+}
+.bb-marquee::before { left: 0; background: linear-gradient(90deg, var(--bb-black), transparent); }
+.bb-marquee::after { right: 0; background: linear-gradient(270deg, var(--bb-black), transparent); }
+.bb-marquee-track { display: flex; gap: 52px; width: max-content; animation: bbMarquee 26s linear infinite; }
+.bb-marquee:hover .bb-marquee-track { animation-play-state: paused; }
+.bb-marquee-item {
+  display: inline-flex; align-items: center; gap: 14px;
+  font-family: var(--bb-font-display); font-size: clamp(0.9rem, 1.6vw, 1.2rem);
+  letter-spacing: 0.28em; text-transform: uppercase; color: var(--bb-silver-deep);
+  white-space: nowrap;
+}
+.bb-marquee-item svg { width: 20px; opacity: 0.5; }
+@keyframes bbMarquee { from { transform: translateX(0); } to { transform: translateX(-50%); } }
+
+/* --------------------------------------------------------------------------
+   8. PAGE-IN WRAPPER (used with the veil transition)
+   -------------------------------------------------------------------------- */
+.bb-page-in { animation: bbPageIn 0.7s var(--bb-ease) both; }
+@keyframes bbPageIn { from { opacity: 0; transform: translateY(18px); } }
+.bb-page-in-slow { animation-duration: 1s; }
+
+/* --------------------------------------------------------------------------
+   9. FORM / STATE MOTION
+   -------------------------------------------------------------------------- */
+.bb-shake { animation: bbShake 0.42s var(--bb-ease); }
+@keyframes bbShake {
+  10%, 90% { transform: translateX(-2px); }
+  20%, 80% { transform: translateX(4px); }
+  30%, 50%, 70% { transform: translateX(-7px); }
+  40%, 60% { transform: translateX(7px); }
+}
+.bb-pop-in { animation: bbPopIn 0.45s var(--bb-ease) both; }
+@keyframes bbPopIn { from { opacity: 0; transform: scale(0.9); } }
+.bb-fade-in { animation: bbFadeIn 0.5s var(--bb-ease) both; }
+@keyframes bbFadeIn { from { opacity: 0; } }
+
+.bb-spin-loader {
+  width: 22px; height: 22px; border-radius: 50%;
+  border: 2px solid rgba(255, 255, 255, 0.22);
+  border-top-color: #fff;
+  animation: bbSpinFast 0.8s linear infinite;
+}
+.bb-btn.is-busy .bb-btn-label { opacity: 0.45; }
+.bb-btn.is-busy::after {
+  content: ""; position: absolute; right: 18px;
+  width: 17px; height: 17px; border-radius: 50%;
+  border: 2px solid rgba(255, 255, 255, 0.35); border-top-color: #fff;
+  animation: bbSpinFast 0.75s linear infinite;
+}
+
+.bb-tick-path { stroke-dasharray: 60; stroke-dashoffset: 60; animation: bbDraw 0.7s var(--bb-ease) 0.25s forwards; }
+
+.bb-cart-line.bb-removing {
+  opacity: 0; transform: translateX(-24px);
+  transition: opacity 0.35s var(--bb-ease), transform 0.35s var(--bb-ease);
+}
+
+/* --------------------------------------------------------------------------
+   10. REDUCED MOTION
+   -------------------------------------------------------------------------- */
+@media (prefers-reduced-motion: reduce) {
+  .bb-reveal, .bb-reveal-block, .bb-stagger > * {
+    opacity: 1 !important; transform: none !important; filter: none !important;
+  }
+  .bb-line-mask > span { transform: none !important; }
+  .bb-wipe, .bb-wipe .bb-line-mask > span { background-position: 0 0 !important; }
+  .bb-marquee-track,
+  .bb-spin-on-hover,
+  .bb-loader-mark .bb-logo-img,
+  .bb-hero-light { animation: none !important; }
+  .bb-float-card:hover { transform: translateY(-4px); }
+  /* social marks still change colour, they just stop lifting */
+  .bb-btn-icon:hover, .bb-btn-icon:active,
+  a.bb-btn[data-social]:hover, a.bb-btn[data-social]:active { transform: none; }
+  .bb-btn-icon::before { transition-duration: 0.01ms; }
+  .bb-page-in { animation: none !important; }
+  /* main.js never builds the full intro under reduced motion, but if the
+     preference flips mid-visit the pieces must sit still, not fade to nothing */
+  .bb-intro-logo .bb-logo-img,
+  .bb-intro-bloom,
+  .bb-intro-word span,
+  .bb-intro-tag,
+  .bb-intro-meta { opacity: 1 !important; transform: none !important; animation: none !important; }
+  .bb-intro-rays,
+  .bb-intro-shine,
+  .bb-intro-shine::before,
+  .bb-intro-bar i { animation: none !important; }
+  .bb-intro-shine { opacity: 0 !important; }
+  .bb-intro-bar i { width: 100% !important; }
+  #bb-loader.bb-intro.bb-loader-hidden { animation: none !important; }
+  /* no moving clip — the hero falls back to the still SVG showroom scene,
+     and .bb-hero-veil goes with it so the artwork keeps its own contrast ramp */
+  .bb-hero-video,
+  .bb-hero-veil { display: none !important; }
+}
