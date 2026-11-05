@@ -113,10 +113,12 @@ Create and update these collections through the site:
 ## 5. Product photos (no Storage needed)
 
 The admin can upload a product photo without enabling Firebase Storage. The browser
-resizes it, compresses it to JPEG (maximum 600 KB), and stores it in the public
-Firestore product document. Keep photos reasonably sized; Firestore documents have a
-1 MiB maximum. The built-in wheel artwork remains the fallback when a product has no
-photo.
+resizes it and stores it in the Firestore product document at no more than 600 KB.
+PNG files stay PNG (including existing transparency); a plain-color background
+connected to the image edges is removed locally when detected. Complex backgrounds
+may still need to be removed before upload. Other supported formats are stored as
+JPEG. Keep photos reasonably sized; Firestore documents have a 1 MiB maximum. The
+built-in wheel artwork remains the fallback when a product has no photo.
 
 ## 6. Configure admin access securely
 
