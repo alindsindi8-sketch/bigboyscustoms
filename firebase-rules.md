@@ -2,8 +2,8 @@
 
 **Firestore** rules for this site, plus the setup they assume. Publish these in the
 Firebase console. Product photos are stored in Firestore; Firebase Storage is not used.
-The rules themselves do not need a service-account key. Booking email notifications are
-sent through EmailJS from the browser as described in `README.md`.
+The rules themselves do not need a service-account key. Booking and cart-order email
+notifications use separate EmailJS templates as described in `README.md`.
 
 ---
 
@@ -17,11 +17,12 @@ Knowing the exact calls makes the rules reviewable instead of guessed.
 | `products` | Admin only | create, update, delete (`/#admin` product form); exact stock is forbidden here |
 | `categories` | Every visitor | Public category list for shop filters |
 | `categories` | Admin only | create and update shop categories from the dashboard |
-| `inventory` | Admin only | read and update wheel stock; stock counts are not exposed in public product documents |
-| `orders` | Anyone (no login needed) | **create only** — a booking request, always `status: 'pending'` |
+| `inventory` | Admin only | read and update exact stock; only a general availability label is public |
+| `orders` | Anyone (no login needed) | **create only** — booking or product-order requests, always `status: 'pending'` |
 | `orders` | Admin only | list and read private customer/vehicle details; update status or delete |
 | `admins/{uid}` | Staff UI | read **own** doc only, to resolve a role when custom claims are not set |
 | `admins/{uid}` | Owner only | create, update, delete staff role documents |
+| `products.availability` | Every visitor | general `in-stock`, `low-stock`, or `out-of-stock` label, updated with inventory changes |
 | `products.imageData` | Every visitor | compressed JPEG data URL stored in the public product document |
 
 Two things the code **never** does, and the rules therefore forbid outright:
@@ -136,7 +137,7 @@ service cloud.firestore {
     function hasLineShape() {
       let items = request.resource.data.items;
       let item = items[0];
-      return items.size() == 1 &&
+      return items.size() > 0 && items.size() <= 40 &&
         item.id is string && item.id.size() > 0 && item.id.size() <= 120 &&
         item.quantity is int && item.quantity > 0 && item.quantity <= 99 &&
         item.price is number && item.price >= 0 && item.price <= 500000;
@@ -158,9 +159,13 @@ service cloud.firestore {
       // the shop is a public catalogue: browseable by anyone
       allow read: if true;
 
-      // Exact inventory counts belong only in the private inventory collection.
+      // Exact inventory counts stay private; only the bounded availability label is public.
       allow create, update: if isStaff() &&
         !('stock' in request.resource.data) &&
+        (!('availability' in request.resource.data) ||
+          request.resource.data.availability == 'in-stock' ||
+          request.resource.data.availability == 'low-stock' ||
+          request.resource.data.availability == 'out-of-stock') &&
         request.resource.data.nameEs is string &&
         request.resource.data.nameEs.size() > 0 &&
         request.resource.data.nameEs.size() <= 120 &&
@@ -216,13 +221,13 @@ service cloud.firestore {
       // a phone number and a home address
       allow read: if isStaff();
 
-      // a visitor may file exactly one thing: a new, pending quote.
+      // a visitor may create only a new, pending booking or product-order request.
       // They cannot read back the collection, cannot touch an existing order,
       // and cannot set any status other than 'pending'.
       allow create: if hasOrderShape() && hasLineShape();
 
-      // Staff may confirm/cancel bookings or mark one sold; the dashboard uses
-      // transactions so status changes and stock reservations/releases happen together.
+      // Staff may confirm/cancel requests or mark one sold; the dashboard uses
+      // transactions so status, private quantities, and public availability update together.
       // Customers can never change a booking or stock.
       allow update: if isStaff();
 
@@ -271,9 +276,10 @@ service cloud.firestore {
 ### Why a customer's total is not blindly trusted
 
 `hasOrderShape()` forces `status == 'pending'`, bounds every string, and rejects a
-payload without items — but Firestore rules cannot re-run your price book for every
-line (rules have a 10-document-read budget per evaluation, and no loop). The order the
-site files is therefore a **quote**, which is exactly what the checkout page tells the
+payload without items. Cart orders may contain up to 40 lines. Firestore rules cannot
+loop through every line, so `hasLineShape()` validates the first line while the client
+checks each line's structure. The order the site files is therefore a **quote**, which
+is exactly what the checkout page tells the
 customer: *"Final shipping and tax are confirmed by our team before payment."* A
 customer editing prices in devtools gains nothing: no payment is taken, staff see the
 number in the dashboard beside the phone call, and only staff can move it out of
@@ -454,10 +460,11 @@ The console's rules editor does not prove what is enforced, so test by effect:
    ```
 3. Sign in as staff and confirm adding, editing, and deleting products changes the
    public catalogue while exact stock remains visible only in the dashboard.
-4. Create a product booking and verify pending status does not change stock. Confirm it
-   and verify stock decreases by the requested quantity. Cancel the confirmed booking
-   and verify that quantity is returned. Confirm another booking and mark it sold;
-   verify stock is not deducted twice.
+4. Create a product order and verify pending status does not change inventory. Confirm it
+   and verify the exact staff-only quantity decreases by the requested amount while the
+   storefront availability changes to low or out of stock. Cancel the confirmed order
+   and verify the quantity returns and storefront status updates. Confirm another order
+   and mark it sold; verify stock is not deducted twice.
 5. Submit another booking from a separate browser; verify it appears in the signed-in
    dashboard with customer details. Sign out and confirm those details disappear.
 

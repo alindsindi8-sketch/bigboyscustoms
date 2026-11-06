@@ -200,7 +200,18 @@ h1,h2,h3,h4,.bb-display{font-family:var(--bb-font-display);font-weight:600;lette
   font-family:var(--bb-font-display);font-size:.72rem;font-weight:600;letter-spacing:.08em;transition:background .3s,border-color .3s}
 .bb-language-toggle:hover,.bb-language-toggle:focus-visible{background:var(--bb-glass-strong);border-color:var(--bb-jade)}
 .bb-language-toggle svg{width:18px;height:18px;flex:0 0 auto}
-.bb-header-inner>.bb-language-toggle+.bb-burger{margin-inline-start:8px}
+.bb-header-cart{position:relative;min-width:48px;height:44px;padding:0 12px;display:flex;align-items:center;justify-content:center;gap:8px;flex:0 0 auto;
+  border:1px solid var(--bb-line-strong);border-radius:14px;background:linear-gradient(145deg,rgba(255,255,255,.09),rgba(255,255,255,.025));
+  color:var(--bb-white);cursor:pointer;box-shadow:inset 0 1px rgba(255,255,255,.07);transition:background .3s,border-color .3s,transform .3s,box-shadow .3s}
+.bb-header-cart:hover,.bb-header-cart:focus-visible{background:linear-gradient(145deg,rgba(90,208,127,.16),rgba(255,255,255,.035));border-color:var(--bb-jade);
+  box-shadow:0 8px 22px -14px rgba(90,208,127,.65),inset 0 1px rgba(255,255,255,.1);transform:translateY(-1px)}
+.bb-header-cart svg{width:19px;height:19px;flex:0 0 auto}
+.bb-header-cart-label{font-family:var(--bb-font-display);font-size:.72rem;font-weight:600;letter-spacing:.1em;text-transform:uppercase}
+.bb-cart-count{min-width:20px;height:20px;padding:0 5px;display:grid;place-items:center;
+  border:1px solid rgba(255,255,255,.34);border-radius:var(--bb-radius-pill);background:var(--bb-red);color:#fff;font:700 .65rem var(--bb-font-display)}
+.bb-cart-count[hidden]{display:none}
+.bb-header-inner>.bb-burger{margin-inline-start:0}
+@media (max-width:480px){.bb-header-cart{width:42px;min-width:42px;height:42px;padding:0;gap:0}.bb-header-cart-label{position:absolute;width:1px;height:1px;overflow:hidden;clip-path:inset(50%);white-space:nowrap}}
 .bb-burger i{display:block;width:19px;height:2px;background:#fff;transition:transform .3s var(--bb-ease),opacity .2s}
 .bb-burger[aria-expanded="true"] i:nth-child(1){transform:translateY(7px) rotate(45deg)}
 .bb-burger[aria-expanded="true"] i:nth-child(2){opacity:0}
@@ -366,6 +377,73 @@ body[data-view="admin"] main>section[data-view="admin"]{animation:bbSectionEnter
 .bb-card-cta svg{width:15px;height:15px;transition:transform .3s var(--bb-ease)}
 .bb-card:hover .bb-card-cta svg{transform:translateX(4px)}
 @media (max-width:380px){.bb-card-desc{font-size:.7rem}.bb-card-name{font-size:.76rem}.bb-card-cta{font-size:.57rem;letter-spacing:.06em}}
+.bb-cart{margin:0;padding:0;border:0;border-radius:0;background:transparent}
+.bb-cart[hidden]{display:none}
+.bb-cart-dialog{width:min(760px,calc(100% - 24px))}
+.bb-cart-dialog .bb-dialog-head{padding:18px 22px}
+.bb-cart-dialog .bb-dialog-head h2{display:flex;align-items:center;gap:10px}
+.bb-cart-dialog .bb-dialog-head h2::before{content:"";width:8px;height:8px;border-radius:50%;background:var(--bb-jade);box-shadow:0 0 14px rgba(90,208,127,.8)}
+.bb-cart-dialog .bb-dialog-body{padding:clamp(16px,3vw,26px)}
+.bb-cart-intro{display:flex;align-items:flex-end;justify-content:space-between;gap:16px;margin-bottom:18px}
+.bb-cart-intro h3{margin:0;color:var(--bb-white);font-family:var(--bb-font-display);font-size:clamp(1.35rem,3vw,1.8rem);letter-spacing:.02em;text-transform:uppercase}
+.bb-cart-intro p{margin:5px 0 0;color:var(--bb-silver-dim);font-size:.84rem}
+.bb-cart-item-count{flex:0 0 auto;padding:7px 11px;border:1px solid var(--bb-line-strong);border-radius:var(--bb-radius-pill);
+  background:rgba(255,255,255,.035);color:var(--bb-silver);font-size:.75rem}
+.bb-cart-items{display:grid;gap:10px;margin:0;padding:0;list-style:none}
+.bb-cart-item-card{display:grid;grid-template-columns:66px minmax(0,1fr) auto;align-items:center;gap:14px;padding:12px;
+  border:1px solid var(--bb-line);border-radius:15px;background:linear-gradient(110deg,rgba(255,255,255,.045),rgba(255,255,255,.015));transition:border-color .25s,background .25s}
+.bb-cart-item-card:hover{border-color:var(--bb-line-strong);background:linear-gradient(110deg,rgba(255,255,255,.065),rgba(255,255,255,.02))}
+.bb-cart-thumb{width:66px;height:66px;display:grid;place-items:center;overflow:hidden;border:1px solid var(--bb-line);border-radius:12px;
+  background:radial-gradient(circle at 50% 40%,rgba(255,255,255,.11),transparent 70%),#090b0e}
+.bb-cart-thumb img{width:100%;height:100%;object-fit:contain}
+.bb-cart-thumb svg{width:34px;height:34px;color:var(--bb-silver-dim)}
+.bb-cart-item-info{min-width:0}
+.bb-cart-item-brand{display:block;margin-bottom:3px;color:var(--bb-silver-deep);font-family:var(--bb-font-display);font-size:.63rem;letter-spacing:.15em;text-transform:uppercase}
+.bb-cart-item-name{display:block;overflow:hidden;color:var(--bb-white);font-family:var(--bb-font-display);font-size:.98rem;letter-spacing:.025em;text-overflow:ellipsis;text-transform:uppercase;white-space:nowrap}
+.bb-cart-item-meta{display:block;margin-top:3px;color:var(--bb-silver-dim);font-size:.76rem}
+.bb-cart-line-bottom{display:flex;align-items:center;gap:10px;margin-top:9px}
+.bb-cart-quantity{display:flex;align-items:center;gap:7px;color:var(--bb-silver-dim);font-size:.72rem}
+.bb-cart-item-card input{width:58px;min-height:32px;padding:4px 7px;border:1px solid var(--bb-line-strong);border-radius:8px;background:#080a0d;color:var(--bb-white);font:inherit;text-align:center}
+.bb-cart-line-total{display:grid;justify-items:end;gap:9px;white-space:nowrap}
+.bb-cart-line-total strong{color:var(--bb-white);font-family:var(--bb-font-display);font-size:.96rem}
+.bb-cart-remove{padding:4px 0;border:0;background:transparent;color:var(--bb-silver-dim);font:inherit;font-size:.72rem;text-decoration:underline;text-underline-offset:3px;cursor:pointer}
+.bb-cart-remove:hover{color:var(--bb-red-bright)}
+.bb-cart-summary{margin-top:16px;padding:16px;border:1px solid rgba(90,208,127,.2);border-radius:15px;
+  background:linear-gradient(120deg,rgba(90,208,127,.065),rgba(255,255,255,.015))}
+.bb-cart-total{display:flex;justify-content:space-between;align-items:center;gap:12px;margin:0;color:var(--bb-silver);font-size:.9rem}
+.bb-cart-total strong{color:var(--bb-white);font-family:var(--bb-font-display);font-size:1.35rem}
+.bb-cart-confirm-note{margin:8px 0 14px;color:var(--bb-silver-dim);font-size:.77rem;line-height:1.5}
+.bb-cart-checkout{width:100%;justify-content:center;min-height:48px}
+.bb-cart-checkout svg{width:17px;height:17px}
+.bb-cart-empty{padding:clamp(26px,6vw,48px) 18px;text-align:center;border:1px dashed var(--bb-line-strong);border-radius:18px;
+  background:radial-gradient(ellipse at 50% 0,rgba(90,208,127,.08),transparent 65%)}
+.bb-cart-empty-icon{width:58px;height:58px;margin:0 auto 14px;display:grid;place-items:center;border:1px solid var(--bb-line-strong);
+  border-radius:18px;background:var(--bb-glass);color:var(--bb-jade)}
+.bb-cart-empty-icon svg{width:26px;height:26px}
+.bb-cart-empty h3{margin:0 0 6px;color:var(--bb-white);font-family:var(--bb-font-display);font-size:1.25rem;text-transform:uppercase}
+.bb-cart-empty p{max-width:38ch;margin:0 auto 18px;color:var(--bb-silver-dim);font-size:.85rem;line-height:1.55}
+.bb-cart-items .bb-cart-item{display:flex;justify-content:space-between;gap:12px;padding:10px 0;border-bottom:1px solid var(--bb-line)}
+.bb-stock-state{display:inline-flex;align-items:center;gap:6px;margin-top:3px;font-size:.74rem}
+.bb-stock-state::before{content:"";width:7px;height:7px;border-radius:50%;background:var(--bb-jade)}
+.bb-stock-state[data-stock="low-stock"]::before{background:#e8ad4c}
+.bb-stock-state[data-stock="out-of-stock"]{color:var(--bb-red-bright)}
+.bb-stock-state[data-stock="out-of-stock"]::before{background:var(--bb-red-bright)}
+.bb-cart-list{display:grid;gap:10px;margin:12px 0;padding:0;list-style:none}
+.bb-cart-item{display:grid;grid-template-columns:minmax(0,1fr) auto auto;align-items:center;gap:12px;padding:10px 0;border-bottom:1px solid var(--bb-line)}
+.bb-cart-item input{width:74px;min-height:38px;padding:6px;border:1px solid var(--bb-line-strong);border-radius:8px;background:#080a0d;color:var(--bb-white);font:inherit}
+.bb-cart-total{display:flex;justify-content:space-between;gap:12px;margin:12px 0;color:var(--bb-white);font-weight:700}
+.bb-cart-remove{border:0;background:transparent;color:var(--bb-red-bright);text-decoration:underline;cursor:pointer}
+@media (max-width:560px){
+  .bb-cart-item-card{grid-template-columns:52px minmax(0,1fr);gap:10px;padding:10px}
+  .bb-cart-thumb{width:52px;height:52px;grid-row:1}
+  .bb-cart-item-name{font-size:.87rem}
+  .bb-cart-item-meta{font-size:.71rem}
+  .bb-cart-line-total{grid-column:2;display:flex;align-items:center;justify-content:space-between}
+  .bb-cart-line-bottom{margin-top:7px}
+  .bb-cart-dialog .bb-dialog-head{padding:14px 16px}
+  .bb-cart-dialog .bb-dialog-body{padding:14px}
+  .bb-cart-intro{align-items:flex-start}
+}
 
 /* ---------- booking + staff dashboard ---------------------------------- */
 .bb-dialog{width:min(720px,calc(100% - 28px));max-width:720px;max-height:min(90vh,900px);padding:0;border:1px solid var(--bb-line-strong);
@@ -376,6 +454,16 @@ body[data-view="admin"] main>section[data-view="admin"]{animation:bbSectionEnter
 .bb-dialog-head h2{font-size:1.35rem;text-transform:uppercase}
 .bb-dialog-close{width:38px;height:38px;border:1px solid var(--bb-line-strong);border-radius:50%;background:var(--bb-glass);color:#fff;font-size:1.25rem}
 .bb-dialog-body{padding:22px}
+.bb-booking-intro{position:relative;overflow:hidden;margin:-4px 0 20px;padding:20px;border:1px solid rgba(90,208,127,.22);
+  border-radius:16px;background:radial-gradient(ellipse at 100% 0,rgba(90,208,127,.14),transparent 58%),linear-gradient(135deg,rgba(255,255,255,.045),rgba(255,255,255,.012))}
+.bb-booking-intro .bb-eyebrow{margin-bottom:8px}
+.bb-booking-intro h3{margin:0 0 7px;color:var(--bb-white);font-family:var(--bb-font-display);font-size:1.35rem;text-transform:uppercase}
+.bb-booking-intro p{max-width:54ch;margin:0;color:var(--bb-silver-dim);font-size:.9rem;line-height:1.6}
+.bb-booking-perks{display:flex;flex-wrap:wrap;gap:8px;margin-top:14px}
+.bb-booking-perks span{padding:6px 10px;border:1px solid var(--bb-line);border-radius:var(--bb-radius-pill);background:rgba(0,0,0,.2);color:var(--bb-silver);font-size:.72rem}
+.bb-service-book{display:inline-flex;align-items:center;gap:9px}
+.bb-service-book svg{width:16px;height:16px}
+.bb-service-book:hover svg{transform:translateY(-2px)}
 .bb-order-detail-grid{display:grid;gap:0;margin:0}
 .bb-order-detail-row{display:grid;grid-template-columns:minmax(120px,.7fr) minmax(0,1.3fr);gap:16px;padding:12px 0;border-bottom:1px solid var(--bb-line)}
 .bb-order-detail-row dt{font-family:var(--bb-font-display);font-size:.72rem;letter-spacing:.1em;text-transform:uppercase;color:var(--bb-silver-dim)}
@@ -604,6 +692,11 @@ body[data-view="admin"] .bb-footer,body[data-view="admin"] .bb-to-top{display:no
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3a15 15 0 0 1 0 18M12 3a15 15 0 0 0 0 18"/></svg>
       <span id="bb-languageCode">EN</span>
     </button>
+    <button type="button" class="bb-header-cart" id="bb-cartOpen" aria-label="Shopping cart, 0 items" title="Shopping cart">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 3h2l2.4 12.2a2 2 0 0 0 2 1.6h8.8a2 2 0 0 0 2-1.6L22 7H6"/><circle cx="10" cy="20" r="1"/><circle cx="18" cy="20" r="1"/></svg>
+      <span class="bb-header-cart-label">Cart</span>
+      <span class="bb-cart-count" id="bb-cartCount" hidden>0</span>
+    </button>
     <button type="button" class="bb-burger" id="bb-burger" aria-expanded="false" aria-controls="bb-mobile" aria-label="Open menu">
       <i></i><i></i><i></i>
     </button>
@@ -710,7 +803,10 @@ body[data-view="admin"] .bb-footer,body[data-view="admin"] .bb-to-top{display:no
       <div class="bb-section-head">
         <p class="bb-eyebrow">What we do</p>
         <h2 class="bb-title bb-title-sweep bb-reveal">One stop, start to finish</h2>
-        <button class="bb-btn bb-btn-primary bb-btn-sm" type="button" data-open-booking="service">Book a service</button>
+        <button class="bb-btn bb-btn-primary bb-btn-sm bb-service-book" type="button" data-open-booking="service">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="5" width="18" height="16" rx="2"/><path d="M16 3v4M8 3v4M3 10h18M8 14h3"/></svg>
+          Book a service
+        </button>
       </div>
       <div class="row g-3 g-lg-4">
         <div class="col-12 col-md-6 col-xl-3">
@@ -906,7 +1002,7 @@ body[data-view="admin"] .bb-footer,body[data-view="admin"] .bb-to-top{display:no
       <div class="bb-section-head">
         <p class="bb-eyebrow">Private staff area</p>
         <h1 class="bb-title">Shop dashboard</h1>
-        <p class="bb-lede">Sign in with an authorized staff account to manage wheel inventory and customer booking requests.</p>
+        <p class="bb-lede">Sign in with an authorized staff account to manage inventory, orders, customer details, confirmations, and printable receipts.</p>
       </div>
       <div class="bb-admin-panel bb-admin-login" id="bb-adminLoginPanel">
         <h3>Staff sign in</h3>
@@ -964,10 +1060,10 @@ body[data-view="admin"] .bb-footer,body[data-view="admin"] .bb-to-top{display:no
           <div class="bb-admin-empty" id="bb-adminProductsEmpty" hidden>No inventory products yet. Add a product above.</div>
         </div>
         <div class="bb-admin-panel">
-          <h3>Booking requests</h3>
-          <p class="bb-muted">Customer details are only loaded after authorized staff sign in.</p>
-          <div class="bb-admin-table-wrap"><table class="bb-admin-table"><thead><tr><th>Customer / vehicle</th><th>Request</th><th>Preferred date</th><th>Status</th><th>Actions</th></tr></thead><tbody id="bb-adminOrders"></tbody></table></div>
-          <div class="bb-admin-empty" id="bb-adminOrdersEmpty" hidden>No booking requests yet.</div>
+          <h3>Orders &amp; bookings</h3>
+          <p class="bb-muted">Customer details update live and are only loaded after authorized staff sign in. Confirm orders and print or download a branded receipt.</p>
+          <div class="bb-admin-table-wrap"><table class="bb-admin-table"><thead><tr><th>Customer / location</th><th>Order</th><th>Request / date</th><th>Status</th><th>Actions</th></tr></thead><tbody id="bb-adminOrders"></tbody></table></div>
+          <div class="bb-admin-empty" id="bb-adminOrdersEmpty" hidden>No orders or booking requests yet.</div>
         </div>
         <p class="bb-form-note" id="bb-adminMessage" role="status" aria-live="polite"></p>
       </div>
@@ -975,18 +1071,63 @@ body[data-view="admin"] .bb-footer,body[data-view="admin"] .bb-to-top{display:no
   </section>
 </main>
 
+<dialog class="bb-dialog bb-cart-dialog" id="bb-cartDialog" aria-labelledby="bb-cartDialogTitle">
+  <div class="bb-dialog-head"><h2 id="bb-cartDialogTitle">Your cart</h2><button class="bb-dialog-close" type="button" id="bb-cartClose" aria-label="Close cart">&times;</button></div>
+  <div class="bb-dialog-body"><div class="bb-cart" id="bb-cart" aria-live="polite"></div></div>
+</dialog>
+
+<dialog class="bb-dialog" id="bb-orderDialog" aria-labelledby="bb-orderTitle">
+  <div class="bb-dialog-head"><h2 id="bb-orderTitle">Order request</h2><button class="bb-dialog-close" type="button" id="bb-orderClose" aria-label="Close order form">&times;</button></div>
+  <div class="bb-dialog-body">
+    <p class="bb-muted" id="bb-orderSelected">Send your cart to the shop. We will confirm stock, delivery, and final pricing before payment.</p>
+    <div id="bb-orderItems" class="bb-cart-list"></div>
+    <form id="bb-orderForm">
+      <div class="bb-form-grid">
+        <div class="bb-field"><label for="bb-orderName">Full name</label><input id="bb-orderName" name="name" autocomplete="name" maxlength="120" required/></div>
+        <div class="bb-field"><label for="bb-orderPhone">Phone</label><input id="bb-orderPhone" name="phone" type="tel" autocomplete="tel" maxlength="40" required/></div>
+        <div class="bb-field"><label for="bb-orderEmail">Email</label><input id="bb-orderEmail" name="email" type="email" autocomplete="email" maxlength="160" required/></div>
+        <div class="bb-field"><label for="bb-orderVehicle">Vehicle (optional)</label><input id="bb-orderVehicle" name="vehicle" maxlength="100" placeholder="e.g. Ford F-250"/></div>
+        <div class="bb-field"><label for="bb-orderFulfillment">Pickup or delivery</label><select id="bb-orderFulfillment" name="fulfillmentMethod" required><option value="pickup">Pickup at BIGBOYS CUSTOMS</option><option value="delivery">Ship to address</option></select></div>
+        <div class="bb-field bb-field-wide" id="bb-orderAddressWrap" hidden>
+          <div class="bb-form-grid">
+            <div class="bb-field bb-field-wide"><label for="bb-orderAddress">Street address</label><input id="bb-orderAddress" name="address" maxlength="160" autocomplete="street-address"/></div>
+            <div class="bb-field"><label for="bb-orderCity">City</label><input id="bb-orderCity" name="city" maxlength="80" autocomplete="address-level2"/></div>
+            <div class="bb-field"><label for="bb-orderState">State</label><input id="bb-orderState" name="state" maxlength="80" autocomplete="address-level1"/></div>
+            <div class="bb-field"><label for="bb-orderZip">ZIP code</label><input id="bb-orderZip" name="zip" maxlength="20" autocomplete="postal-code"/></div>
+          </div>
+        </div>
+        <div class="bb-field bb-field-wide"><label for="bb-orderNotes">Order notes</label><textarea id="bb-orderNotes" name="notes" maxlength="1500" placeholder="Fitment details, preferred finish, or questions"></textarea></div>
+        <div class="bb-field bb-field-wide"><button class="bb-btn bb-btn-primary bb-btn-block" type="submit" id="bb-orderSubmit">Send order request</button><p class="bb-form-note" id="bb-orderMessage" role="status" aria-live="polite"></p></div>
+      </div>
+    </form>
+  </div>
+</dialog>
+
 <dialog class="bb-dialog" id="bb-bookingDialog" aria-labelledby="bb-bookingTitle">
   <div class="bb-dialog-head"><h2 id="bb-bookingTitle">Book a visit</h2><button class="bb-dialog-close" type="button" id="bb-bookingClose" aria-label="Close booking form">&times;</button></div>
   <div class="bb-dialog-body">
+    <div class="bb-booking-intro">
+      <p class="bb-eyebrow">Let’s get your ride right</p>
+      <h3>Plan your shop visit</h3>
+      <p>Tell us what you need and when works for you. This is a request, not a payment or confirmed appointment — our team will contact you to lock it in.</p>
+      <div class="bb-booking-perks"><span>Free fitment check</span><span>Open 7 days</span><span>No payment to request</span></div>
+    </div>
     <p class="bb-muted" id="bb-bookingSelected">Tell us what you need and the shop will contact you to confirm availability.</p>
     <form id="bb-bookingForm">
-      <input type="hidden" name="productId"/>
       <div class="bb-form-grid">
         <div class="bb-field"><label for="bb-bookingName">Full name</label><input id="bb-bookingName" name="name" autocomplete="name" maxlength="120" required/></div>
         <div class="bb-field"><label for="bb-bookingPhone">Phone</label><input id="bb-bookingPhone" name="phone" type="tel" autocomplete="tel" maxlength="40" required/></div>
         <div class="bb-field"><label for="bb-bookingEmail">Email</label><input id="bb-bookingEmail" name="email" type="email" autocomplete="email" maxlength="160" required/></div>
         <div class="bb-field"><label for="bb-bookingService">What do you need?</label><select id="bb-bookingService" name="service" required><option value="">Choose a service</option><option>Wheel / tire purchase</option><option>Mount &amp; balance</option><option>Lift kit</option><option>Drop kit</option><option>Fitment check</option><option>Other</option></select></div>
-        <div class="bb-field" id="bb-bookingQuantityWrap" hidden><label for="bb-bookingQuantity">Quantity</label><input id="bb-bookingQuantity" name="quantity" type="number" min="1" step="1" value="1"/></div>
+        <div class="bb-field"><label for="bb-fulfillmentMethod">Pickup or delivery</label><select id="bb-fulfillmentMethod" name="fulfillmentMethod" required><option value="pickup">Pickup at BIGBOYS CUSTOMS</option><option value="delivery">Ship to address</option></select></div>
+        <div class="bb-field bb-field-wide" id="bb-deliveryAddressWrap" hidden>
+          <div class="bb-form-grid">
+            <div class="bb-field bb-field-wide"><label for="bb-deliveryAddress">Street address</label><input id="bb-deliveryAddress" name="address" maxlength="160" autocomplete="street-address"/></div>
+            <div class="bb-field"><label for="bb-deliveryCity">City</label><input id="bb-deliveryCity" name="city" maxlength="80" autocomplete="address-level2"/></div>
+            <div class="bb-field"><label for="bb-deliveryState">State</label><input id="bb-deliveryState" name="state" maxlength="80" autocomplete="address-level1"/></div>
+            <div class="bb-field"><label for="bb-deliveryZip">ZIP code</label><input id="bb-deliveryZip" name="zip" maxlength="20" autocomplete="postal-code"/></div>
+          </div>
+        </div>
         <div class="bb-field"><label for="bb-bookingYear">Vehicle year</label><input id="bb-bookingYear" name="year" inputmode="numeric" maxlength="4" required/></div>
         <div class="bb-field"><label for="bb-bookingMakeModel">Make &amp; model</label><input id="bb-bookingMakeModel" name="vehicle" maxlength="100" placeholder="e.g. Ford F-250" required/></div>
         <div class="bb-field"><label for="bb-bookingDate">Preferred date</label><input id="bb-bookingDate" name="date" type="date" required/></div>
@@ -1092,6 +1233,9 @@ body[data-view="admin"] .bb-footer,body[data-view="admin"] .bb-to-top{display:no
     'American Force, Forgiato and Intros sets, tires in the size you run, lift and drop kits, then mounted, balanced and torqued to spec in our own bays. Bring the truck, bring the vision — we handle the rest.': 'Conjuntos American Force, Forgiato e Intros, llantas del tamaño que necesitas y kits de elevación y descenso. Los montamos, balanceamos y ajustamos según las especificaciones en nuestro taller. Trae tu camioneta y tu idea; nosotros nos encargamos del resto.',
     'Open 7 days a week': 'Abierto los 7 días de la semana', 'Financing available': 'Financiamiento disponible',
     'Nationwide shipping': 'Envíos a todo el país', 'Free fitment check': 'Revisión de compatibilidad gratis', 'Scroll': 'Desliza',
+    'Let’s get your ride right': 'Preparemos tu camioneta', 'Plan your shop visit': 'Planea tu visita al taller',
+    'Tell us what you need and when works for you. This is a request, not a payment or confirmed appointment — our team will contact you to lock it in.': 'Cuéntanos qué necesitas y cuándo te conviene. Esta es una solicitud, no un pago ni una cita confirmada; nuestro equipo se comunicará contigo para confirmarla.',
+    'No payment to request': 'Solicitar no tiene costo',
     '22" – 26" forged': 'Rines forjados de 22" a 26"', '35" – 40" tires': 'Llantas de 35" a 40"', '6" lift systems': 'Sistemas de elevación de 6"',
     'Forged & cast': 'Forjados y fundidos', 'Luxury lines': 'Líneas de lujo', 'Chrome & color': 'Cromo y color',
     'Complete kits': 'Kits completos', 'Stance setups': 'Configuraciones de altura', 'Featured setups': 'Configuraciones destacadas',
@@ -1148,7 +1292,7 @@ body[data-view="admin"] .bb-footer,body[data-view="admin"] .bb-to-top{display:no
     'Booking details': 'Detalles de la reserva', 'Close booking details': 'Cerrar detalles de la reserva', 'View details': 'Ver detalles',
     'Customer name': 'Nombre del cliente', 'Customer email': 'Correo del cliente', 'Customer phone': 'Teléfono del cliente',
     'Vehicle': 'Vehículo', 'Service': 'Servicio', 'Date': 'Fecha', 'Time': 'Hora', 'Request notes': 'Notas de la solicitud',
-    'Order notes': 'Notas del pedido', 'Items': 'Artículos', 'Subtotal': 'Subtotal', 'Tax': 'Impuestos', 'Total': 'Total',
+    'Items': 'Artículos', 'Subtotal': 'Subtotal', 'Tax': 'Impuestos', 'Total': 'Total',
     'Created': 'Creada', 'Order ID': 'ID de solicitud',
     'Customer / vehicle': 'Cliente / vehículo', 'Request': 'Solicitud', 'Preferred date': 'Fecha preferida', 'Status': 'Estado', 'Actions': 'Acciones',
     'No booking requests yet.': 'Aún no hay solicitudes.', 'Book a visit': 'Reservar una visita', 'Close booking form': 'Cerrar formulario de reserva',
@@ -1163,9 +1307,24 @@ body[data-view="admin"] .bb-footer,body[data-view="admin"] .bb-to-top{display:no
     'Lift & drop kits': 'Kits de elevación y descenso', 'Financing & shipping': 'Financiamiento y envíos', 'What we run': 'Nuestras marcas', 'Visit the shop': 'Visita el taller',
     'All rights reserved.': 'Todos los derechos reservados.', 'Developed by': 'Desarrollado por', 'Back to top': 'Volver arriba',
     'In stock': 'Disponible', 'Featured': 'Destacado', 'Luxury': 'Lujo', 'Sale': 'Oferta', 'Package': 'Paquete', 'Demo': 'Muestra',
-    'Currently unavailable': 'No disponible', 'Stock confirmed by shop': 'Existencias por confirmar', 'Out of stock': 'Agotado',
+    'Currently unavailable': 'No disponible', 'Stock confirmed by shop': 'Existencias por confirmar',
+    'Low stock': 'Pocas existencias', 'Out of stock': 'Agotado',
     'Ask about this item': 'Consultar este producto', 'Book this set': 'Reservar este conjunto', 'sets available': 'conjuntos disponibles',
     'set available': 'conjunto disponible', 'items available': 'artículos disponibles', 'item available': 'artículo disponible',
+    'Shopping cart': 'Carrito de compras', 'Cart': 'Carrito', 'Your cart': 'Tu carrito', 'Close cart': 'Cerrar carrito',
+    'Your cart is empty': 'Tu carrito está vacío', 'Review your setup before sending an order request.': 'Revisa tu selección antes de enviar el pedido.',
+    'Your cart is empty. Add products from the shop to start an order.': 'Tu carrito está vacío. Agrega productos de la tienda para iniciar un pedido.',
+    'Browse products': 'Ver productos', 'Product no longer available': 'El producto ya no está disponible',
+    'Remove': 'Quitar', 'each': 'cada uno', 'item': 'artículo', 'Estimated subtotal': 'Subtotal estimado',
+    'Quantity for': 'Cantidad de',
+    'Final stock, shipping, tax, and price are confirmed by the shop before payment.': 'La tienda confirmará existencias, envío, impuestos y precio antes del pago.',
+    'Continue to order request': 'Continuar a solicitud de pedido', 'Order request': 'Solicitud de pedido',
+    'Send your cart to the shop. We will confirm stock, delivery, and final pricing before payment.': 'Envía tu carrito a la tienda. Confirmaremos existencias, entrega y precio final antes del pago.',
+    'The shop will confirm stock, delivery, and final pricing before payment.': 'La tienda confirmará existencias, entrega y precio final antes del pago.',
+    'Order notes': 'Notas del pedido', 'Pickup or delivery': 'Recoger o enviar', 'Ship to address': 'Enviar a domicilio',
+    'Street address': 'Dirección', 'City': 'Ciudad', 'State': 'Estado', 'ZIP code': 'Código postal', 'items': 'artículos',
+    'Product order': 'Pedido de productos', 'Service booking': 'Reserva de servicio', 'Request type': 'Tipo de solicitud',
+    'Request / date': 'Solicitud / fecha',
     'Edit': 'Editar', 'Delete': 'Eliminar', 'Confirm': 'Confirmar', 'Mark sold': 'Marcar como vendido', 'Cancel': 'Cancelar', 'Qty': 'Cant.',
     'pending': 'pendiente', 'confirmed': 'confirmado', 'cancelled': 'cancelado', 'sold': 'vendido', 'No phone': 'Sin teléfono',
     'Not specified': 'No especificado', 'No products available right now. Please call the shop for availability.': 'No hay productos disponibles ahora. Llama al taller.',
@@ -1393,13 +1552,15 @@ body[data-view="admin"] .bb-footer,body[data-view="admin"] .bb-to-top{display:no
   function cardHTML(p) {
     var stockKnown = p.stock !== null && p.stock !== '' && p.stock !== undefined && Number.isFinite(Number(p.stock));
     var stock = stockKnown ? Math.max(0, Number(p.stock)) : null;
+    var availability = p.availability || (stockKnown ? (stock < 1 ? 'out-of-stock' : stock <= 3 ? 'low-stock' : 'in-stock') : '');
     var finish = ['chrome', 'milled', 'black', 'bronze'].indexOf(p.finish) >= 0 ? p.finish : 'chrome';
     var spokes = Math.min(16, Math.max(3, Number(p.spokes) || 6));
-    var disabled = stockKnown && stock < 1;
+    var disabled = stockKnown ? stock < 1 : availability === 'out-of-stock';
     var productName = language === 'es' ? (p.nameEs || p.name) : p.name;
     var productDescription = language === 'es' ? (p.descEs || p.desc) : p.desc;
     var productCategory = categoryLabel(p.category, p.categoryEs);
-    var stockText = disabled ? translate('Currently unavailable') : !stockKnown ? translate('Stock confirmed by shop') :
+    var stockText = disabled ? translate('Out of stock') : availability === 'low-stock' ? translate('Low stock') :
+      availability === 'in-stock' ? translate('In stock') : !stockKnown ? translate('Stock confirmed by shop') :
       language === 'es' ? stock + (String(p.category || '').toLowerCase().includes('wheel') ? (stock === 1 ? ' conjunto disponible' : ' conjuntos disponibles') : (stock === 1 ? ' artículo disponible' : ' artículos disponibles')) :
       stock + (String(p.category || '').toLowerCase().includes('wheel') ? (stock === 1 ? ' set available' : ' sets available') : (stock === 1 ? ' item available' : ' items available'));
     return '<article class="bb-card">' +
@@ -1415,11 +1576,11 @@ body[data-view="admin"] .bb-footer,body[data-view="admin"] .bb-to-top{display:no
         '<p class="bb-card-desc">' + escapeHTML(p.size || '') + (productDescription ? ' · ' + escapeHTML(productDescription) : '') + '</p>' +
         '<div class="bb-card-foot">' +
           '<div class="bb-price">' + money(p.price) + (p.was ? '<s>' + money(p.was) + '</s>' : '') +
-            '<span class="bb-card-desc" style="display:block;margin-top:3px">' +
+            '<span class="bb-card-desc bb-stock-state" data-stock="' + escapeHTML(availability) + '">' +
               escapeHTML(stockText) +
             '</span></div>' +
-          '<button class="bb-card-cta" type="button" data-book-product="' + escapeHTML(p.id) + '"' + (disabled ? ' disabled aria-disabled="true"' : '') + '>' +
-            translate(disabled ? 'Out of stock' : 'Ask about this item') +
+          '<button class="bb-card-cta" type="button" data-add-cart="' + escapeHTML(p.id) + '"' + (disabled ? ' disabled aria-disabled="true"' : '') + '>' +
+            translate(disabled ? 'Out of stock' : 'Add to cart') +
             '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M5 12h14M13 5l7 7-7 7"/></svg></button>' +
         '</div>' +
       '</div></article>';
@@ -1719,8 +1880,10 @@ body[data-view="admin"] .bb-footer,body[data-view="admin"] .bb-to-top{display:no
   const EMAILJS_CONFIG = {
     serviceId: 'service_30fz8li',
     templateId: 'template_j1enomt',
+    orderTemplateId: 'template_0qf1bal',
     publicKey: 'i0TVrEsDLwmkCVg5Q'
   };
+  const OWNER_EMAIL = 'alindisindi8@gmail.com';
   const ADMIN_EMAIL = 'bigboys@admin.com';
   const page = document;
   const $ = (selector) => page.querySelector(selector);
@@ -1736,9 +1899,13 @@ body[data-view="admin"] .bb-footer,body[data-view="admin"] .bb-to-top{display:no
   const loginMessage = $('#bb-adminLoginMessage');
   const setupNote = $('#bb-adminSetupNote');
   const bookingMessage = $('#bb-bookingMessage');
+  const orderMessage = $('#bb-orderMessage');
   const loginForm = $('#bb-adminLoginForm');
   const bookingForm = $('#bb-bookingForm');
+  const orderForm = $('#bb-orderForm');
   const bookingDialog = $('#bb-bookingDialog');
+  const orderDialog = $('#bb-orderDialog');
+  const cartDialog = $('#bb-cartDialog');
   const categoryForm = $('#bb-adminCategoryForm');
   const productForm = $('#bb-adminProductForm');
   const workspace = $('#bb-adminWorkspace');
@@ -1747,6 +1914,7 @@ body[data-view="admin"] .bb-footer,body[data-view="admin"] .bb-to-top{display:no
   let db = null;
   let auth = null;
   let catalog = (window.BBApp && window.BBApp.demoProducts) || [];
+  let cart = [];
   let preparedImageData = '';
   let preparedImageKey = '';
   let inventoryById = new Map();
@@ -1768,13 +1936,88 @@ body[data-view="admin"] .bb-footer,body[data-view="admin"] .bb-to-top{display:no
   function money(value) {
     return '$' + (Number(value) || 0).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
   }
+  function stockAvailability(stock) {
+    if (!Number.isInteger(stock) || stock < 0 || stock > 1000000) {
+      throw new Error('Inventory has an invalid stock count.');
+    }
+    return stock < 1 ? 'out-of-stock' : stock <= 3 ? 'low-stock' : 'in-stock';
+  }
   function slug(value) {
     return String(value).toLowerCase().trim().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '').slice(0, 60);
   }
-  function productService(product) {
-    const category = String(product && product.category || '').toLowerCase();
-    return category.includes('lift') ? 'Lift kit' : category.includes('drop') ? 'Drop kit' :
-      category.includes('wheel') || category.includes('tire') ? 'Wheel / tire purchase' : 'Other';
+  function cartProduct(id) {
+    return catalog.find((product) => product.id === id);
+  }
+  function renderCart() {
+    const panel = $('#bb-cart');
+    if (!panel) return;
+    const itemCount = cart.reduce((total, item) => total + item.quantity, 0);
+    const countBadge = $('#bb-cartCount');
+    const cartButton = $('#bb-cartOpen');
+    if (countBadge) {
+      countBadge.textContent = String(itemCount);
+      countBadge.hidden = itemCount === 0;
+    }
+    if (cartButton) cartButton.setAttribute('aria-label', window.BBApp.translate('Shopping cart') + ', ' +
+      itemCount + ' ' + window.BBApp.translate(itemCount === 1 ? 'item' : 'items'));
+    if (!cart.length) {
+      panel.innerHTML = '<div class="bb-cart-empty"><div class="bb-cart-empty-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 3h2l2.4 12.2a2 2 0 0 0 2 1.6h8.8a2 2 0 0 0 2-1.6L22 7H6"/><circle cx="10" cy="20" r="1"/><circle cx="18" cy="20" r="1"/></svg></div>' +
+        '<h3>' + window.BBApp.translate('Your cart is empty') + '</h3>' +
+        '<p>' + window.BBApp.translate('Your cart is empty. Add products from the shop to start an order.') + '</p>' +
+        '<a class="bb-btn bb-btn-primary bb-btn-sm" href="#shop" data-cart-browse>' + window.BBApp.translate('Browse products') + '</a></div>';
+      return;
+    }
+    let subtotal = 0;
+    const rows = cart.map((line) => {
+      const product = cartProduct(line.id);
+      if (!product) {
+        return '<li class="bb-cart-item-card"><div class="bb-cart-thumb"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" aria-hidden="true"><circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="3"/><path d="M12 3v6m0 6v6M3 12h6m6 0h6"/></svg></div>' +
+          '<div class="bb-cart-item-info"><strong class="bb-cart-item-name">' + window.BBApp.translate('Product no longer available') + '</strong></div>' +
+          '<button class="bb-cart-remove" type="button" data-cart-remove="' + html(line.id) + '">' + window.BBApp.translate('Remove') + '</button></li>';
+      }
+      const lineTotal = (Number(product.price) || 0) * line.quantity;
+      subtotal += lineTotal;
+      const thumbnail = product.imageData ?
+        '<img src="' + html(product.imageData) + '" alt="" loading="lazy">' :
+        '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.55" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="6.3"/><circle cx="12" cy="12" r="2"/><path d="m12 3 0 7m0 4 0 7M3 12h7m4 0h7M5.64 5.64l4.95 4.95m2.82 2.82 4.95 4.95m0-12.72-4.95 4.95m-2.82 2.82-4.95 4.95"/></svg>';
+      return '<li class="bb-cart-item-card"><div class="bb-cart-thumb">' + thumbnail + '</div>' +
+        '<div class="bb-cart-item-info"><span class="bb-cart-item-brand">' + html(product.brand || window.BBApp.productText(product, 'category') || '') + '</span>' +
+        '<strong class="bb-cart-item-name">' + html(window.BBApp.productText(product, 'name')) + '</strong>' +
+        '<span class="bb-cart-item-meta">' + (product.size ? html(product.size) + ' · ' : '') + money(product.price) + ' ' + window.BBApp.translate('each') + '</span>' +
+        '<div class="bb-cart-line-bottom"><label class="bb-cart-quantity">' + window.BBApp.translate('Quantity') +
+        '<input type="number" min="1" max="99" step="1" value="' + line.quantity + '" aria-label="' + window.BBApp.translate('Quantity for') + ' ' + html(window.BBApp.productText(product, 'name')) + '" data-cart-quantity="' + html(line.id) + '"></label></div></div>' +
+        '<div class="bb-cart-line-total"><strong>' + money(lineTotal) + '</strong><button class="bb-cart-remove" type="button" data-cart-remove="' + html(line.id) + '">' + window.BBApp.translate('Remove') + '</button></div></li>';
+    }).join('');
+    panel.innerHTML = '<div class="bb-cart-intro"><div><h3>' + window.BBApp.translate('Your cart') + '</h3>' +
+      '<p>' + window.BBApp.translate('Review your setup before sending an order request.') + '</p></div>' +
+      '<span class="bb-cart-item-count">' + itemCount + ' ' + window.BBApp.translate(itemCount === 1 ? 'item' : 'items') + '</span></div>' +
+      '<ul class="bb-cart-items">' + rows + '</ul>' +
+      '<div class="bb-cart-summary"><div class="bb-cart-total"><span>' + window.BBApp.translate('Estimated subtotal') + '</span><strong>' + money(subtotal) + '</strong></div>' +
+      '<p class="bb-cart-confirm-note">' + window.BBApp.translate('Final stock, shipping, tax, and price are confirmed by the shop before payment.') + '</p>' +
+      '<button class="bb-btn bb-btn-primary bb-cart-checkout" type="button" data-cart-checkout>' + window.BBApp.translate('Continue to order request') +
+      '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" aria-hidden="true"><path d="M5 12h14M13 5l7 7-7 7"/></svg></button></div>';
+  }
+  function updateDeliveryFields() {
+    const method = $('#bb-fulfillmentMethod');
+    const wrap = $('#bb-deliveryAddressWrap');
+    if (!method || !wrap) return;
+    const delivery = method.value === 'delivery';
+    wrap.hidden = !delivery;
+    ['address', 'city', 'state', 'zip'].forEach((name) => {
+      const field = bookingForm.elements.namedItem(name);
+      if (field) field.required = delivery;
+    });
+  }
+  function updateOrderDeliveryFields() {
+    const method = $('#bb-orderFulfillment');
+    const wrap = $('#bb-orderAddressWrap');
+    if (!method || !wrap) return;
+    const delivery = method.value === 'delivery';
+    wrap.hidden = !delivery;
+    ['address', 'city', 'state', 'zip'].forEach((name) => {
+      const field = orderForm.elements.namedItem(name);
+      if (field) field.required = delivery;
+    });
   }
   function imageKey(file) {
     return [file.name, file.size, file.lastModified, file.type].join(':');
@@ -1891,6 +2134,30 @@ body[data-view="admin"] .bb-footer,body[data-view="admin"] .bb-to-top{display:no
     catalog = products;
     if (window.BBApp) window.BBApp.renderProducts(products);
     showAdminProducts();
+    renderCart();
+    if (firebase && db && inventoryById.size) {
+      syncPublicAvailability().catch((error) =>
+        message($('#bb-adminMessage'), 'Could not sync storefront availability: ' + error.message, true)
+      );
+    }
+  }
+  async function syncPublicAvailability() {
+    const updates = catalog.flatMap((product) => {
+      const inventory = inventoryById.get(product.id);
+      if (!inventory) return [];
+      const availability = stockAvailability(Number(inventory.stock));
+      return product.availability === availability ? [] : [{ product, availability }];
+    });
+    for (let offset = 0; offset < updates.length; offset += 450) {
+      const batch = firebase.writeBatch(db);
+      updates.slice(offset, offset + 450).forEach(({ product, availability }) => {
+        batch.update(firebase.doc(db, 'products', product.id), {
+          availability: availability,
+          updatedAt: firebase.serverTimestamp()
+        });
+      });
+      await batch.commit();
+    }
   }
   function showOrders(orders) {
     currentOrders = new Map(orders.map((order) => [order.id, order]));
@@ -1900,14 +2167,24 @@ body[data-view="admin"] .bb-footer,body[data-view="admin"] .bb-to-top{display:no
     tbody.innerHTML = orders.map((order) => {
       const customer = order.customer || {};
       const booking = order.booking || {};
-      const item = (order.items || [])[0] || {};
+      const items = order.items || [];
+      const fulfillment = order.fulfillment || {};
+      const location = fulfillment.method === 'delivery' ?
+        [fulfillment.city, fulfillment.state, fulfillment.zip].filter(Boolean).join(', ') : 'Pickup';
+      const itemSummary = items.map((item) =>
+        (window.BBApp.getLanguage() === 'es' ? item.nameEs || item.name : item.name) + ' × ' + Number(item.quantity || 1)
+      ).join(', ') || booking.service || 'Booking';
+      const requestDate = booking.date ?
+        html(booking.date) + '<br>' + html(window.BBApp.translate(booking.time || '')) :
+        html(window.BBApp.translate(order.type === 'product-order' ? 'Product order' : 'Not specified'));
       const canSell = order.status !== 'sold' && order.status !== 'cancelled';
       return '<tr><td><strong>' + html(customer.name || 'Customer') + '</strong><br>' +
         '<a href="tel:' + html(customer.phone || '') + '">' + html(customer.phone || 'No phone') + '</a><br>' +
-        html(booking.year || '') + ' ' + html(booking.vehicle || '') + '</td>' +
-        '<td>' + html(window.BBApp.translate(booking.service || (window.BBApp.getLanguage() === 'es' ? item.nameEs || item.name : item.name) || 'Booking')) + (item.quantity > 1 ? ' · ' + window.BBApp.translate('Qty') + ' ' + Number(item.quantity) : '') +
-        (booking.notes ? '<br><span class="bb-muted">' + html(booking.notes) + '</span>' : '') + '</td>' +
-        '<td>' + html(booking.date || window.BBApp.translate('Not specified')) + '<br>' + html(window.BBApp.translate(booking.time || '')) + '</td>' +
+        '<a href="mailto:' + html(customer.email || '') + '">' + html(customer.email || 'No email') + '</a><br>' +
+        html(booking.year || '') + ' ' + html(booking.vehicle || order.vehicle || '') + '<br><span class="bb-muted">' + html(location) + '</span></td>' +
+        '<td>' + html(itemSummary) + '<br><strong>' + money(order.total) + '</strong>' +
+        ((booking.notes || order.notes) ? '<br><span class="bb-muted">' + html(booking.notes || order.notes) + '</span>' : '') + '</td>' +
+        '<td>' + requestDate + '</td>' +
         '<td><span class="bb-admin-status">' + html(window.BBApp.translate(order.status || 'pending')) + '</span></td>' +
         '<td><div class="bb-admin-actions">' +
         '<button type="button" data-order-action="details" data-id="' + html(order.id) + '">' + window.BBApp.translate('View details') + '</button>' +
@@ -1918,11 +2195,11 @@ body[data-view="admin"] .bb-footer,body[data-view="admin"] .bb-to-top{display:no
         '</div></td></tr>';
     }).join('');
     if (empty) empty.hidden = orders.length > 0;
-    const requestedBookingId = new URLSearchParams(win.location.hash.split('?')[1] || '').get('booking');
+    const requestedBookingId = new URLSearchParams(window.location.hash.split('?')[1] || '').get('booking');
     const requestedOrder = requestedBookingId && currentOrders.get(requestedBookingId);
     if (requestedOrder) {
       showOrderDetails(requestedOrder);
-      win.history.replaceState(null, '', '#admin');
+      window.history.replaceState(null, '', '#admin');
     }
   }
   function showOrderDetails(order) {
@@ -1935,9 +2212,13 @@ body[data-view="admin"] .bb-footer,body[data-view="admin"] .bb-to-top{display:no
       const itemName = window.BBApp.productText(item, 'name') || 'Booking';
       const quantity = Math.max(1, Number(item.quantity) || 1);
       const unitPrice = Number(item.price) || 0;
-      return '<li><span><strong>' + html(itemName) + '</strong><br><span class="bb-muted">' + window.BBApp.translate('Qty') + ' ' + quantity + ' × ' + money(unitPrice) + '</span></span><strong>' + money(quantity * unitPrice) + '</strong></li>';
+      return '<li><span><strong>' + html(itemName) + '</strong><br><span class="bb-muted">' + window.BBApp.translate('Qty') + ' ' + quantity + ' × ' + money(unitPrice) + (item.size ? ' · ' + html(item.size) : '') + (item.sku ? ' · SKU ' + html(item.sku) : '') + '</span></span><strong>' + money(quantity * unitPrice) + '</strong></li>';
     }).join('');
     const row = (label, value) => '<div class="bb-order-detail-row"><dt>' + window.BBApp.translate(label) + '</dt><dd>' + html(value || window.BBApp.translate('Not specified')) + '</dd></div>';
+    const fulfillment = order.fulfillment || {};
+    const location = fulfillment.method === 'delivery' ?
+      [fulfillment.address, fulfillment.city, fulfillment.state, fulfillment.zip].filter(Boolean).join(', ') :
+      'Pickup at BIGBOYS CUSTOMS, 3100 Mansfield Hwy, Forest Hill, TX 76119';
     content.innerHTML =
       '<dl class="bb-order-detail-grid">' +
         row('Order ID', order.id) +
@@ -1946,11 +2227,13 @@ body[data-view="admin"] .bb-footer,body[data-view="admin"] .bb-to-top{display:no
         row('Customer name', customer.name) +
         row('Customer phone', customer.phone) +
         row('Customer email', customer.email) +
-        row('Vehicle', [booking.year, booking.vehicle].filter(Boolean).join(' ')) +
-        row('Service', booking.service) +
-        row('Date', booking.date) +
-        row('Time', window.BBApp.translate(booking.time || '')) +
-        row('Request notes', booking.notes) +
+        row('Request type', order.type === 'product-order' ? 'Product order' : booking.service ? 'Service booking' : 'Booking') +
+        row('Fulfillment', fulfillment.method === 'delivery' ? 'Delivery' : 'Pickup') +
+        row('Delivery location', location) +
+        row('Vehicle', [booking.year, booking.vehicle || order.vehicle].filter(Boolean).join(' ')) +
+        (booking.service ? row('Service', booking.service) + row('Date', booking.date) +
+          row('Time', window.BBApp.translate(booking.time || '')) : '') +
+        (booking.notes ? row('Request notes', booking.notes) : '') +
         row('Order notes', order.notes) +
       '</dl>' +
       '<h3 style="margin:20px 0 8px">' + window.BBApp.translate('Items') + '</h3>' +
@@ -1959,12 +2242,72 @@ body[data-view="admin"] .bb-footer,body[data-view="admin"] .bb-to-top{display:no
         row('Subtotal', money(order.subtotal)) +
         row('Tax', money(order.tax)) +
         row('Total', money(order.total)) +
-      '</dl>';
+      '</dl>' +
+      '<div class="bb-admin-actions" style="margin-top:20px">' +
+        '<button type="button" data-receipt-action="download" data-id="' + html(order.id) + '">Download receipt</button>' +
+        '<button type="button" data-receipt-action="print" data-id="' + html(order.id) + '">Print receipt</button>' +
+      '</div>';
     if (typeof dialog.showModal === 'function') dialog.showModal();
+  }
+  function receiptMarkup(order) {
+    const customer = order.customer || {};
+    const booking = order.booking || {};
+    const fulfillment = order.fulfillment || {};
+    const deliveryLocation = fulfillment.method === 'delivery' ?
+      [fulfillment.address, fulfillment.city, fulfillment.state, fulfillment.zip].filter(Boolean).join(', ') :
+      'Pickup at BIGBOYS CUSTOMS, 3100 Mansfield Hwy, Forest Hill, TX 76119';
+    const requestDetails = booking.service ?
+      '<dt>Vehicle</dt><dd>' + html([booking.year, booking.vehicle].filter(Boolean).join(' ')) + '</dd><dt>Service</dt><dd>' +
+      html(booking.service) + '</dd><dt>Preferred date/time</dt><dd>' + html([booking.date, booking.time].filter(Boolean).join(' · ')) + '</dd>' :
+      (order.vehicle ? '<dt>Vehicle</dt><dd>' + html(order.vehicle) + '</dd>' : '');
+    const rows = (order.items || []).map((item) => {
+      const quantity = Math.max(1, Number(item.quantity) || 1);
+      const unitPrice = Number(item.price) || 0;
+      return '<tr><td>' + html(window.BBApp.productText(item, 'name') || item.name || 'Order item') +
+        (item.size ? '<br><small>' + html(item.size) + '</small>' : '') +
+        (item.sku ? '<br><small>SKU: ' + html(item.sku) + '</small>' : '') +
+        '</td><td>' + quantity + '</td><td>' + money(unitPrice) + '</td><td>' + money(unitPrice * quantity) + '</td></tr>';
+    }).join('');
+    const logo = new URL('logo1.png', window.location.href).href;
+    return '<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>BIGBOYS CUSTOMS Receipt ' + html(order.id) + '</title><style>' +
+      'body{font:14px Arial,sans-serif;color:#171717;margin:0;padding:32px}.receipt{max-width:760px;margin:auto}.head{display:flex;align-items:center;gap:22px;border-bottom:3px solid #185d35;padding-bottom:18px}.head img{width:110px;height:110px;object-fit:contain}.head h1{margin:0;color:#185d35;font-size:28px}.muted{color:#555}.title{margin:24px 0 4px;font-size:23px}dl{display:grid;grid-template-columns:150px 1fr;gap:8px 14px}dt{font-weight:bold}dd{margin:0;overflow-wrap:anywhere}table{width:100%;border-collapse:collapse;margin:22px 0}th,td{text-align:left;padding:10px 8px;border-bottom:1px solid #ccc;vertical-align:top}th{background:#f1f5f2}td:nth-child(n+2),th:nth-child(n+2){text-align:right}.totals{margin-left:auto;width:min(320px,100%)}.totals div{display:flex;justify-content:space-between;padding:6px;border-bottom:1px solid #ddd}.totals .grand{font-size:18px;font-weight:bold;color:#185d35}.notice{margin-top:24px;padding:12px;background:#f4f4f4}.actions{margin:24px 0}.actions button{padding:10px 16px;background:#185d35;color:white;border:0;border-radius:4px;cursor:pointer}@media print{body{padding:0}.actions{display:none}.receipt{max-width:none}}' +
+      '</style></head><body><main class="receipt"><header class="head"><img src="' + html(logo) + '" alt="BIGBOYS CUSTOMS logo"><div><h1>BIGBOYS CUSTOMS</h1><div>3100 Mansfield Hwy, Forest Hill, TX 76119</div><div>817-535-2284</div></div></header>' +
+      '<h2 class="title">Order request receipt</h2><p class="muted">This is an order request, not proof of payment. Final pricing, stock, shipping and taxes are confirmed by the shop.</p>' +
+      '<dl><dt>Order ID</dt><dd>' + html(order.id) + '</dd><dt>Status</dt><dd>' + html(order.status || 'pending') + '</dd><dt>Date</dt><dd>' + html(order.createdAt ? formatDate(order.createdAt) : new Date().toLocaleDateString()) + '</dd>' +
+      '<dt>Customer</dt><dd>' + html(customer.name || '') + '</dd><dt>Phone</dt><dd>' + html(customer.phone || '') + '</dd><dt>Email</dt><dd>' + html(customer.email || '') + '</dd>' +
+      '<dt>Fulfillment</dt><dd>' + (fulfillment.method === 'delivery' ? 'Delivery' : 'Pickup') + '</dd><dt>Location</dt><dd>' + html(deliveryLocation) + '</dd>' +
+      requestDetails + '</dl>' +
+      '<table><thead><tr><th>Item</th><th>Qty</th><th>Unit price</th><th>Line total</th></tr></thead><tbody>' + rows + '</tbody></table>' +
+      '<div class="totals"><div><span>Subtotal</span><strong>' + money(order.subtotal) + '</strong></div><div><span>Tax estimate</span><strong>' + money(order.tax) + '</strong></div><div class="grand"><span>Estimated total</span><strong>' + money(order.total) + '</strong></div></div>' +
+      (booking.notes || order.notes ? '<p class="notice"><strong>Notes:</strong> ' + html(booking.notes || order.notes) + '</p>' : '') +
+      '<div class="actions"><button type="button" onclick="window.print()">Print receipt</button></div></main></body></html>';
+  }
+  function downloadReceipt(order) {
+    const blob = new Blob([receiptMarkup(order)], { type: 'text/html;charset=utf-8' });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement('a');
+    link.href = url;
+    link.download = 'BIGBOYS-Receipt-' + order.id + '.html';
+    document.body.append(link);
+    link.click();
+    link.remove();
+    window.setTimeout(() => URL.revokeObjectURL(url), 1000);
+  }
+  function printReceipt(order) {
+    const printWindow = window.open('', '_blank');
+    if (!printWindow) throw new Error('Allow pop-ups to print the receipt.');
+    printWindow.document.open();
+    printWindow.document.write(receiptMarkup(order));
+    printWindow.document.close();
+    printWindow.addEventListener('load', () => {
+      printWindow.focus();
+      printWindow.print();
+    }, { once: true });
   }
   page.addEventListener('bb-language-change', () => {
     showAdminProducts();
     showOrders(Array.from(currentOrders.values()));
+    renderCart();
   });
   function clearListeners() {
     if (stopOrders) stopOrders();
@@ -2004,39 +2347,141 @@ body[data-view="admin"] .bb-footer,body[data-view="admin"] .bb-to-top{display:no
     $('#bb-productCancel').hidden = !data.id;
   }
 
+  page.addEventListener('click', (event) => {
+    const cartOpenButton = event.target.closest('#bb-cartOpen');
+    if (cartOpenButton) {
+      if (cartDialog && typeof cartDialog.showModal === 'function') {
+        renderCart();
+        cartDialog.showModal();
+      }
+      return;
+    }
+    const addButton = event.target.closest('[data-add-cart]');
+    if (addButton) {
+      const product = cartProduct(addButton.dataset.addCart);
+      if (!product) {
+        message($('#bb-storefrontStatus'), 'That product is no longer available. Refresh the shop and try again.', true);
+        return;
+      }
+      const line = cart.find((item) => item.id === product.id);
+      if (line && line.quantity >= 99) {
+        message($('#bb-storefrontStatus'), 'The maximum quantity for this item is 99.', true);
+        return;
+      }
+      if (line) line.quantity++;
+      else if (cart.length >= 40) {
+        message($('#bb-storefrontStatus'), 'Your cart can contain up to 40 different products.', true);
+        return;
+      } else cart.push({ id: product.id, quantity: 1 });
+      renderCart();
+      message($('#bb-storefrontStatus'), window.BBApp.productText(product, 'name') + ' added to your cart.');
+      return;
+    }
+    if (event.target.closest('[data-cart-browse]')) {
+      if (cartDialog) cartDialog.close();
+      return;
+    }
+    const removeButton = event.target.closest('[data-cart-remove]');
+    if (removeButton) {
+      cart = cart.filter((line) => line.id !== removeButton.dataset.cartRemove);
+      renderCart();
+      return;
+    }
+    const checkoutButton = event.target.closest('[data-cart-checkout]');
+    const serviceButton = event.target.closest('[data-open-booking]');
+    if (!checkoutButton && !serviceButton) return;
+    if (checkoutButton) {
+      if (!orderDialog || typeof orderDialog.showModal !== 'function') {
+        message(orderMessage, 'Your browser does not support checkout. Please call 817-535-2284.', true);
+        return;
+      }
+      const orderItems = cart.map((line) => {
+        const product = cartProduct(line.id);
+        if (!product) return null;
+        return {
+          id: product.id,
+          quantity: line.quantity,
+          price: Number(product.price) || 0,
+          name: product.name,
+          nameEs: product.nameEs || product.name,
+          size: product.size || '',
+          sku: product.sku || '',
+          inventory: true
+        };
+      });
+      if (!orderItems.length || orderItems.some((item) => !item) || orderItems.length > 40 ||
+          orderItems.some((item) => !Number.isInteger(item.quantity) || item.quantity < 1 || item.quantity > 99)) {
+        message($('#bb-storefrontStatus'), 'Your cart contains a product that is no longer available or has an invalid quantity. Refresh the shop and review your cart.', true);
+        return;
+      }
+      orderForm.reset();
+      updateOrderDeliveryFields();
+      const itemsList = $('#bb-orderItems');
+      itemsList.innerHTML = orderItems.map((item) => '<li class="bb-cart-item"><span><strong>' +
+        html(window.BBApp.productText(item, 'name')) + '</strong><br><span class="bb-muted">' +
+        item.quantity + ' × ' + money(item.price) + '</span></span><strong>' +
+        money(item.quantity * item.price) + '</strong></li>').join('');
+      const estimated = orderItems.reduce((sum, item) => sum + item.quantity * item.price, 0);
+      const itemCount = orderItems.reduce((sum, item) => sum + item.quantity, 0);
+      $('#bb-orderSelected').textContent = itemCount + ' ' +
+        window.BBApp.translate(itemCount === 1 ? 'item' : 'items') + ' · ' + window.BBApp.translate('Estimated subtotal') + ' ' +
+        money(estimated) + '. ' + window.BBApp.translate('The shop will confirm stock, delivery, and final pricing before payment.');
+      message(orderMessage, '');
+      cartDialog.close();
+      orderDialog.showModal();
+      return;
+    }
+    bookingForm.reset();
+    $('#bb-bookingTitle').textContent = 'Book a visit';
+    $('#bb-bookingSelected').textContent = 'Tell us what you need and the shop will contact you to confirm availability.';
+    $('#bb-bookingSubmit').textContent = 'Send booking request';
+    updateDeliveryFields();
+    message(bookingMessage, '');
+    bookingDialog.showModal();
+  });
+  page.addEventListener('change', (event) => {
+    const quantityInput = event.target.closest('[data-cart-quantity]');
+    if (quantityInput) {
+      const quantity = Number(quantityInput.value);
+      if (!Number.isInteger(quantity) || quantity < 1 || quantity > 99) {
+        message($('#bb-storefrontStatus'), 'Choose a whole-number quantity between 1 and 99.', true);
+        renderCart();
+        return;
+      }
+      const line = cart.find((item) => item.id === quantityInput.dataset.cartQuantity);
+      if (line) line.quantity = quantity;
+      renderCart();
+    }
+    if (event.target.id === 'bb-fulfillmentMethod') updateDeliveryFields();
+    if (event.target.id === 'bb-orderFulfillment') updateOrderDeliveryFields();
+  });
+  $('#bb-cartClose').addEventListener('click', () => cartDialog.close());
+  cartDialog.addEventListener('click', (event) => {
+    if (event.target === cartDialog) cartDialog.close();
+  });
+  $('#bb-orderClose').addEventListener('click', () => orderDialog.close());
+  orderDialog.addEventListener('click', (event) => {
+    if (event.target === orderDialog) orderDialog.close();
+  });
+  $('#bb-bookingClose').addEventListener('click', () => bookingDialog.close());
+  bookingDialog.addEventListener('click', (event) => {
+    if (event.target === bookingDialog) bookingDialog.close();
+  });
+  renderCart();
+
   if (!configReady) {
     const setupMessage = 'Firebase is not connected. Add the public Web app config in this file before enabling online bookings or staff access.';
     message(setupNote, setupMessage, true);
     message(loginMessage, 'Dashboard locked until Firebase is configured.', true);
     $('#bb-adminLoginButton').disabled = true;
     page.body.setAttribute('data-live', 'demo');
-    page.addEventListener('click', (event) => {
-      const productButton = event.target.closest('[data-book-product]');
-      const serviceButton = event.target.closest('[data-open-booking]');
-      if (!productButton && !serviceButton) return;
-      if (!bookingDialog || typeof bookingDialog.showModal !== 'function') {
-        message(bookingMessage, 'Please call 817-535-2284 to book a visit.', true);
-        return;
-      }
-      bookingForm.reset();
-      const product = productButton ? catalog.find((item) => item.id === productButton.dataset.bookProduct) : null;
-      bookingForm.elements.namedItem('productId').value = product ? product.id : '';
-      $('#bb-bookingSelected').textContent = product ?
-        product.name + ' · ' + money(product.price) + ' · ' + Math.max(0, Number(product.stock) || 0) + ' available' :
-        'Tell us what you need and the shop will contact you to confirm availability.';
-      if (product) $('#bb-bookingService').value = productService(product);
-      $('#bb-bookingQuantityWrap').hidden = !product;
-      $('#bb-bookingQuantity').max = product ? Math.max(1, Number(product.stock) || 1) : '';
-      message(bookingMessage, setupMessage, true);
-      bookingDialog.showModal();
-    });
-    $('#bb-bookingClose').addEventListener('click', () => bookingDialog.close());
-    bookingDialog.addEventListener('click', (event) => {
-      if (event.target === bookingDialog) bookingDialog.close();
-    });
     bookingForm.addEventListener('submit', (event) => {
       event.preventDefault();
       message(bookingMessage, setupMessage + ' Your details have not been stored. Please call 817-535-2284.', true);
+    });
+    orderForm.addEventListener('submit', (event) => {
+      event.preventDefault();
+      message(orderMessage, setupMessage + ' Your details have not been stored. Please call 817-535-2284.', true);
     });
   } else {
     showProducts([]);
@@ -2079,32 +2524,6 @@ body[data-view="admin"] .bb-footer,body[data-view="admin"] .bb-to-top{display:no
         message($('#bb-adminMessage'), 'Could not load products: ' + error.message, true);
       });
 
-      const selectedInput = bookingForm && bookingForm.elements.namedItem('productId');
-      page.addEventListener('click', (event) => {
-        const productButton = event.target.closest('[data-book-product]');
-        const serviceButton = event.target.closest('[data-open-booking]');
-        if (!productButton && !serviceButton) return;
-        if (!bookingDialog || typeof bookingDialog.showModal !== 'function') {
-          message(bookingMessage, 'Your browser does not support the booking form. Please call 817-535-2284.', true);
-          return;
-        }
-        bookingForm.reset();
-        const product = productButton ? catalog.find((item) => item.id === productButton.dataset.bookProduct) : null;
-        selectedInput.value = product ? product.id : '';
-        $('#bb-bookingSelected').textContent = product ?
-          window.BBApp.productText(product, 'name') + ' · ' + money(product.price) + ' · ' + window.BBApp.translate('Stock confirmed by shop') :
-          window.BBApp.translate('Tell us what you need and the shop will contact you to confirm availability.');
-        const serviceSelect = $('#bb-bookingService');
-        if (product) serviceSelect.value = productService(product);
-        $('#bb-bookingQuantityWrap').hidden = !product;
-        $('#bb-bookingQuantity').max = product ? (product.stock == null ? 99 : Math.max(1, Number(product.stock) || 1)) : '';
-        message(bookingMessage, '');
-        bookingDialog.showModal();
-      });
-      $('#bb-bookingClose').addEventListener('click', () => bookingDialog.close());
-      bookingDialog.addEventListener('click', (event) => {
-        if (event.target === bookingDialog) bookingDialog.close();
-      });
       bookingForm.addEventListener('submit', async (event) => {
         event.preventDefault();
         if (!db || !firebase) {
@@ -2112,43 +2531,47 @@ body[data-view="admin"] .bb-footer,body[data-view="admin"] .bb-to-top{display:no
           return;
         }
         const values = new FormData(bookingForm);
-        const productId = String(values.get('productId') || '');
-        const product = productId ? catalog.find((item) => item.id === productId) : null;
-        if (productId && !product) {
-          message(bookingMessage, 'That product is no longer available. Refresh the shop and try again.', true);
-          return;
-        }
-        const quantity = product ? Number(values.get('quantity')) : 1;
-        if (product && (!Number.isInteger(quantity) || quantity < 1 || quantity > 99)) {
-          message(bookingMessage, 'Choose a whole-number quantity between 1 and 99.', true);
-          return;
-        }
         const year = String(values.get('year') || '').trim();
         if (!/^\d{4}$/.test(year)) {
           message(bookingMessage, 'Enter the vehicle year using four digits.', true);
           return;
         }
+        const orderItems = [{
+          id: 'service-booking',
+          quantity: 1,
+          price: 0,
+          name: String(values.get('service')),
+          nameEs: String(values.get('service')),
+          inventory: false
+        }];
+        const fulfillmentMethod = String(values.get('fulfillmentMethod') || 'pickup');
+        const fulfillment = {
+          method: fulfillmentMethod,
+          address: fulfillmentMethod === 'delivery' ? String(values.get('address') || '').trim() : '',
+          city: fulfillmentMethod === 'delivery' ? String(values.get('city') || '').trim() : '',
+          state: fulfillmentMethod === 'delivery' ? String(values.get('state') || '').trim() : '',
+          zip: fulfillmentMethod === 'delivery' ? String(values.get('zip') || '').trim() : ''
+        };
+        if (!['pickup', 'delivery'].includes(fulfillmentMethod) ||
+            (fulfillmentMethod === 'delivery' && (!fulfillment.address || !fulfillment.city || !fulfillment.state || !fulfillment.zip))) {
+          message(bookingMessage, 'Enter the full delivery address, city, state, and ZIP code.', true);
+          return;
+        }
         const submit = $('#bb-bookingSubmit');
         submit.disabled = true;
         try {
-          const item = product ? {
-            id: product.id,
-            quantity: quantity,
-            price: Number(product.price) || 0,
-            name: product.name,
-            nameEs: product.nameEs || product.name,
-            inventory: true
-          } : { id: 'service-booking', quantity: 1, price: 0, name: String(values.get('service')), inventory: false };
           const notes = String(values.get('notes') || '').trim();
-          const amount = item.price * item.quantity;
+          const amount = orderItems.reduce((sum, item) => sum + item.price * item.quantity, 0);
           const order = await firebase.addDoc(firebase.collection(db, 'orders'), {
+            type: 'booking',
             status: 'pending',
             customer: {
               name: String(values.get('name')).trim(),
               phone: String(values.get('phone')).trim(),
               email: String(values.get('email')).trim()
             },
-            items: [item],
+            items: orderItems,
+            fulfillment: fulfillment,
             booking: {
               service: String(values.get('service')),
               year: year,
@@ -2164,6 +2587,7 @@ body[data-view="admin"] .bb-footer,body[data-view="admin"] .bb-to-top{display:no
             createdAt: firebase.serverTimestamp()
           });
           bookingForm.reset();
+          updateDeliveryFields();
           bookingDialog.close();
           try {
             if (!EMAILJS_CONFIG.serviceId || !EMAILJS_CONFIG.templateId || !EMAILJS_CONFIG.publicKey) {
@@ -2172,10 +2596,26 @@ body[data-view="admin"] .bb-footer,body[data-view="admin"] .bb-to-top{display:no
             }
             const emailjs = await import('https://cdn.jsdelivr.net/npm/@emailjs/browser@4/+esm');
             const bookingLink = new URL('/#admin?booking=' + encodeURIComponent(order.id), window.location.origin).toString();
+            const deliveryLocation = fulfillment.method === 'delivery' ?
+              [fulfillment.address, fulfillment.city, fulfillment.state, fulfillment.zip].join(', ') :
+              'Pickup at BIGBOYS CUSTOMS, 3100 Mansfield Hwy, Forest Hill, TX 76119';
+            const itemDetails = orderItems.map((item) =>
+              item.name + ' | Qty ' + item.quantity + ' | ' + money(item.price) + ' each | ' + money(item.price * item.quantity)
+            ).join('\n');
             await emailjs.send(EMAILJS_CONFIG.serviceId, EMAILJS_CONFIG.templateId, {
+              to_email: OWNER_EMAIL,
+              owner_email: OWNER_EMAIL,
+              order_id: order.id,
               customer_name: String(values.get('name')).trim(),
               customer_email: String(values.get('email')).trim(),
               customer_phone: String(values.get('phone')).trim(),
+              items: itemDetails,
+              item_details: itemDetails,
+              subtotal: money(amount),
+              tax: money(0),
+              total: money(amount),
+              fulfillment_method: fulfillment.method,
+              delivery_location: deliveryLocation,
               service: String(values.get('service')),
               vehicle: year + ' ' + String(values.get('vehicle')).trim(),
               date: String(values.get('date')),
@@ -2183,14 +2623,125 @@ body[data-view="admin"] .bb-footer,body[data-view="admin"] .bb-to-top{display:no
               notes: notes || 'None',
               booking_link: bookingLink
             }, { publicKey: EMAILJS_CONFIG.publicKey });
-            alert(window.BBApp.translate('Your request was sent. The shop will contact you to confirm your booking.'));
+            alert('Your booking request was sent to BIGBOYS CUSTOMS. The shop will contact you to confirm the visit.');
           } catch (emailError) {
             console.error('Booking was saved, but the owner email notification failed.', emailError);
             const reason = emailError instanceof Error ? emailError.message : String(emailError);
-            alert('Your booking was saved, but the owner email could not be sent. EmailJS error: ' + reason + '. Check the EmailJS service, template recipient, allowed domain, and free-tier limit.');
+            alert('Your booking was saved, but the owner email could not be sent. EmailJS error: ' + reason + '. Check the EmailJS service, booking template recipient, allowed domain, and free-tier limit.');
           }
         } catch (error) {
           message(bookingMessage, 'Booking could not be sent: ' + error.message, true);
+        } finally {
+          submit.disabled = false;
+        }
+      });
+
+      orderForm.addEventListener('submit', async (event) => {
+        event.preventDefault();
+        if (!db || !firebase) {
+          message(orderMessage, 'Online ordering is unavailable until Firebase is connected. Please call 817-535-2284.', true);
+          return;
+        }
+        const values = new FormData(orderForm);
+        const orderItems = cart.map((line) => {
+          const product = cartProduct(line.id);
+          if (!product) return null;
+          return {
+            id: product.id,
+            quantity: line.quantity,
+            price: Number(product.price) || 0,
+            name: product.name,
+            nameEs: product.nameEs || product.name,
+            size: product.size || '',
+            sku: product.sku || '',
+            inventory: true
+          };
+        });
+        if (!orderItems.length || orderItems.length !== cart.length || orderItems.some((item) =>
+          !item || !Number.isInteger(item.quantity) || item.quantity < 1 || item.quantity > 99
+        )) {
+          message(orderMessage, 'One or more products are no longer available or have an invalid quantity. Review your cart and try again.', true);
+          return;
+        }
+        const fulfillmentMethod = String(values.get('fulfillmentMethod') || 'pickup');
+        const fulfillment = {
+          method: fulfillmentMethod,
+          address: fulfillmentMethod === 'delivery' ? String(values.get('address') || '').trim() : '',
+          city: fulfillmentMethod === 'delivery' ? String(values.get('city') || '').trim() : '',
+          state: fulfillmentMethod === 'delivery' ? String(values.get('state') || '').trim() : '',
+          zip: fulfillmentMethod === 'delivery' ? String(values.get('zip') || '').trim() : ''
+        };
+        if (!['pickup', 'delivery'].includes(fulfillmentMethod) ||
+            (fulfillmentMethod === 'delivery' && (!fulfillment.address || !fulfillment.city || !fulfillment.state || !fulfillment.zip))) {
+          message(orderMessage, 'Enter the full delivery address, city, state, and ZIP code.', true);
+          return;
+        }
+        const submit = $('#bb-orderSubmit');
+        submit.disabled = true;
+        try {
+          const notes = String(values.get('notes') || '').trim();
+          const amount = orderItems.reduce((sum, item) => sum + item.price * item.quantity, 0);
+          const order = await firebase.addDoc(firebase.collection(db, 'orders'), {
+            type: 'product-order',
+            status: 'pending',
+            customer: {
+              name: String(values.get('name')).trim(),
+              phone: String(values.get('phone')).trim(),
+              email: String(values.get('email')).trim()
+            },
+            items: orderItems,
+            fulfillment: fulfillment,
+            vehicle: String(values.get('vehicle') || '').trim(),
+            notes: notes,
+            subtotal: amount,
+            tax: 0,
+            total: amount,
+            createdAt: firebase.serverTimestamp()
+          });
+          cart = [];
+          renderCart();
+          orderForm.reset();
+          updateOrderDeliveryFields();
+          orderDialog.close();
+          try {
+            if (!EMAILJS_CONFIG.serviceId || !EMAILJS_CONFIG.orderTemplateId || !EMAILJS_CONFIG.publicKey) {
+              alert('Your order request was saved, but order email is not set up yet. Add a separate Order Template ID to EMAILJS_CONFIG in index.html and publish the website.');
+              return;
+            }
+            const emailjs = await import('https://cdn.jsdelivr.net/npm/@emailjs/browser@4/+esm');
+            const orderLink = new URL('/#admin?booking=' + encodeURIComponent(order.id), window.location.origin).toString();
+            const deliveryLocation = fulfillment.method === 'delivery' ?
+              [fulfillment.address, fulfillment.city, fulfillment.state, fulfillment.zip].join(', ') :
+              'Pickup at BIGBOYS CUSTOMS, 3100 Mansfield Hwy, Forest Hill, TX 76119';
+            const itemDetails = orderItems.map((item) =>
+              item.name + ' | Qty ' + item.quantity + ' | ' + money(item.price) + ' each | ' + money(item.price * item.quantity)
+            ).join('\n');
+            await emailjs.send(EMAILJS_CONFIG.serviceId, EMAILJS_CONFIG.orderTemplateId, {
+              to_email: OWNER_EMAIL,
+              owner_email: OWNER_EMAIL,
+              order_id: order.id,
+              customer_name: String(values.get('name')).trim(),
+              customer_email: String(values.get('email')).trim(),
+              customer_phone: String(values.get('phone')).trim(),
+              items: itemDetails,
+              item_details: itemDetails,
+              subtotal: money(amount),
+              tax: money(0),
+              total: money(amount),
+              fulfillment_method: fulfillment.method,
+              delivery_location: deliveryLocation,
+              vehicle: String(values.get('vehicle') || '').trim() || 'Not specified',
+              notes: notes || 'None',
+              order_link: orderLink
+            }, { publicKey: EMAILJS_CONFIG.publicKey });
+            alert('Your order request was sent to BIGBOYS CUSTOMS. The shop will contact you to confirm stock, delivery, and final pricing.');
+          } catch (emailError) {
+            console.error('Order was saved, but the owner email notification failed.', emailError);
+            const reason = emailError instanceof Error ? emailError.message : String(emailError);
+            alert('Your order was saved, but the owner email could not be sent. EmailJS error: ' + reason + '. Check the EmailJS service, order template recipient, allowed domain, and free-tier limit.');
+          }
+        } catch (error) {
+          message(orderMessage, 'Order request could not be sent: ' + error.message, true);
         } finally {
           submit.disabled = false;
         }
@@ -2326,7 +2877,11 @@ body[data-view="admin"] .bb-footer,body[data-view="admin"] .bb-to-top{display:no
           product.imageData = values.get('removeImage') ? '' : imageFile && imageFile.size ?
             (preparedImageKey === selectedImageKey ? preparedImageData : await compressProductImage(imageFile)) : (existing && existing.imageData) || '';
           const batch = firebase.writeBatch(db);
-          batch.set(firebase.doc(db, 'products', id), { ...product, stock: firebase.deleteField() }, { merge: true });
+          batch.set(firebase.doc(db, 'products', id), {
+            ...product,
+            availability: stockAvailability(stock),
+            stock: firebase.deleteField()
+          }, { merge: true });
           batch.set(firebase.doc(db, 'inventory', id), { stock: stock, updatedAt: firebase.serverTimestamp() }, { merge: true });
           await batch.commit();
           setProductEditing(null);
@@ -2402,22 +2957,45 @@ body[data-view="admin"] .bb-footer,body[data-view="admin"] .bb-to-top{display:no
                 stockChange = 1;
               }
 
-              const inventoryItems = stockChange ? (latest.items || []).filter((item) => item.inventory === true) : [];
+              const inventoryQuantities = new Map();
+              if (stockChange) {
+                (latest.items || []).filter((item) => item.inventory === true).forEach((item) => {
+                  if (typeof item.id !== 'string' || !item.id || item.id.length > 120 ||
+                      !Number.isInteger(item.quantity) || item.quantity < 1) {
+                    throw new Error('The order has an invalid product or quantity.');
+                  }
+                  const quantity = (inventoryQuantities.get(item.id) || 0) + item.quantity;
+                  if (quantity > 99) throw new Error('The combined quantity for a product cannot exceed 99.');
+                  inventoryQuantities.set(item.id, quantity);
+                });
+              }
+              const inventoryItems = Array.from(inventoryQuantities, ([id, quantity]) => ({ id, quantity }));
               const productSnapshots = [];
               for (const item of inventoryItems) {
                 const inventoryRef = firebase.doc(db, 'inventory', item.id);
-                productSnapshots.push({ item, ref: inventoryRef, snapshot: await transaction.get(inventoryRef) });
+                const productRef = firebase.doc(db, 'products', item.id);
+                productSnapshots.push({
+                  item,
+                  ref: inventoryRef,
+                  snapshot: await transaction.get(inventoryRef),
+                  productRef,
+                  productSnapshot: await transaction.get(productRef)
+                });
               }
-              productSnapshots.forEach(({ item, ref, snapshot }) => {
+              productSnapshots.forEach(({ item, ref, snapshot, productRef, productSnapshot }) => {
                 if (!snapshot.exists()) throw new Error('Inventory record is missing for a booked product; fix stock before changing this booking.');
-                const quantity = Number(item.quantity);
-                if (!Number.isInteger(quantity) || quantity < 1) throw new Error('The booking has an invalid product quantity.');
                 const stock = Number(snapshot.data().stock);
                 if (!Number.isInteger(stock) || stock < 0) throw new Error('The inventory record has an invalid stock count.');
-                const updatedStock = stock + (stockChange * quantity);
+                const updatedStock = stock + (stockChange * item.quantity);
                 if (updatedStock < 0) throw new Error('Not enough stock to confirm or sell this booking.');
                 if (updatedStock > 1000000) throw new Error('Returning this booking would exceed the allowed stock limit.');
                 transaction.update(ref, { stock: updatedStock, updatedAt: firebase.serverTimestamp() });
+                if (productSnapshot.exists()) {
+                  transaction.update(productRef, {
+                    availability: stockAvailability(updatedStock),
+                    updatedAt: firebase.serverTimestamp()
+                  });
+                }
               });
 
               if (action === 'delete') {
@@ -2470,6 +3048,9 @@ body[data-view="admin"] .bb-footer,body[data-view="admin"] .bb-to-top{display:no
           stopInventory = firebase.onSnapshot(firebase.collection(db, 'inventory'), (snapshot) => {
             inventoryById = new Map(snapshot.docs.map((entry) => [entry.id, entry.data()]));
             showAdminProducts();
+            syncPublicAvailability().catch((error) =>
+              message($('#bb-adminMessage'), 'Could not sync storefront availability: ' + error.message, true)
+            );
           }, (error) => message($('#bb-adminMessage'), 'Inventory listener error: ' + error.message, true));
           if (stopOrders) stopOrders();
           stopOrders = firebase.onSnapshot(
@@ -2490,6 +3071,10 @@ body[data-view="admin"] .bb-footer,body[data-view="admin"] .bb-to-top{display:no
         if (!event.target.closest('[data-book-product], [data-open-booking]')) return;
         if (bookingDialog && typeof bookingDialog.showModal === 'function') bookingDialog.showModal();
         message(bookingMessage, 'The booking service could not connect. Please call 817-535-2284.', true);
+      });
+      orderForm.addEventListener('submit', (event) => {
+        event.preventDefault();
+        message(orderMessage, 'The ordering service could not connect. Your details were not stored. Please call 817-535-2284.', true);
       });
       $('#bb-bookingClose').addEventListener('click', () => bookingDialog.close());
       bookingForm.addEventListener('submit', (event) => {

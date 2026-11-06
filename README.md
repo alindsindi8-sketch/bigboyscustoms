@@ -5,14 +5,13 @@ Email **Bigboyscustoms@live.com** · [Instagram](https://www.instagram.com/bigbo
 [TikTok](https://www.tiktok.com/@bigboyscustoms) · [YouTube](https://www.youtube.com/@bigboyscustoms)
 
 This workspace currently runs as one `index.html` file with hash-based Home, Shop,
-Services, Why Us, Contact, and Staff Dashboard views. It includes a customer booking
-form and Firebase-backed product, booking, and stock-management code.
+Services, Why Us, Contact, and Staff Dashboard views. It includes separate customer
+booking and cart-order forms, plus Firebase-backed product and stock management.
 
-**Firebase is not configured in this copy yet.** The public web config values in the
-inline `FIREBASE_CONFIG` object in `index.html` are blank. Until those are supplied and
-the Firestore rules below are published, the shop shows preview products, booking
-submissions are not stored, and staff sign-in stays disabled. Do not treat preview
-inventory as live stock.
+**Firebase is already configured in this copy.** The public web config values in the
+inline `FIREBASE_CONFIG` object in `index.html` are present. Publish the rules in
+[`firebase-rules.md`](firebase-rules.md) before relying on online requests or live
+inventory. Never treat preview inventory as live stock.
 
 The site uses **HTML, CSS, vanilla JavaScript, and Firebase** and can be served as static
 files; the local server is for preview only.
@@ -29,7 +28,7 @@ files; the local server is for preview only.
 6. [Give yourself admin access — securely](#6-configure-admin-access-securely)
 7. [Deploy to Vercel (free)](#7-deploy-to-vercel-free)
 8. [Connect your custom domain](#8-connect-a-custom-domain)
-* [Booking email notifications](#booking-email-notifications) · [Preview mode and staff dashboard](#preview-mode-and-staff-dashboard) · [Payments and customer data](#payments-and-customer-data) · [Current files](#current-files) · [Troubleshooting](#troubleshooting) · [Security rules](#security-rules)
+* [Booking and order email notifications](#booking-and-order-email-notifications) · [Preview mode and staff dashboard](#preview-mode-and-staff-dashboard) · [Payments and customer data](#payments-and-customer-data) · [Current files](#current-files) · [Troubleshooting](#troubleshooting) · [Security rules](#security-rules)
 
 ---
 
@@ -49,8 +48,8 @@ Two things to know while developing:
   `import()`, which browsers refuse to run from a `file://` page. Live Server,
   `npx serve`, or `python -m http.server` all work; opening the HTML by double-clicking
   shows the site but not the live-data features.
-* **Before setup:** sample cards display a Demo badge; the booking form explains that
-  nothing is stored until Firebase is connected.
+* **If Firebase is unavailable:** sample cards display a Demo badge; the booking and
+  order forms explain that requests are not stored until the connection is restored.
 
 ## 2. Create the Firebase project
 
@@ -86,17 +85,24 @@ Two things to know while developing:
 2. Region: **`us-central`** or the closest to Texas (`us-east1` is a good pick).
 3. Start in **production mode** (locked). The rules in
    [`firebase-rules.md`](firebase-rules.md) allow public catalogue reads and booking
-   submissions, while protecting customer bookings and exact stock counts.
+   and product-order submissions, while protecting customer details and exact stock counts.
 
 Create and update these collections through the site:
 
 | collection | what lands in it |
 | --- | --- |
-| `products` | public product details, without exact stock counts |
+| `products` | public product details and general availability (in stock / low stock / out of stock), without exact stock counts |
 | `categories` | shop categories such as Wheels & Tires, Lift Kits, and Drop Kits |
 | `inventory` | exact stock counts, readable and writable only by authorized staff |
-| `orders` | booking requests, starting at `pending`; private to staff for reading |
+| `orders` | booking and cart-order requests, starting at `pending`; private to staff for reading |
 | `admins` | `{your-uid}` with `role: "owner"` |
+
+When staff confirm an order, inventory is reduced in the same Firestore transaction
+that confirms the order; cancelling a confirmed order returns the quantity. The
+dashboard shows exact counts, while the public shop shows only **In stock**, **Low
+stock** (three or fewer), or **Out of stock**. Existing products synchronize their
+availability the first time authorized staff sign in after publishing the updated site
+and rules.
 
 ## 4. Enable Authentication
 
@@ -110,31 +116,42 @@ Create and update these collections through the site:
 5. Leave "Email link / Google / Anonymous" off — this dashboard is staff-only and
    customers never create accounts.
 
-## Booking email notifications
+## Booking and order email notifications
 
-Booking emails use EmailJS from the browser, so Firebase Cloud Functions and the Firebase
-Blaze billing plan are not required. EmailJS offers a free tier subject to its current
-usage limits. The booking is saved in Firestore first; if email sending fails, the
-customer is told the booking was still submitted and to call the shop.
+Booking and product-order emails use EmailJS from the browser, so Firebase Cloud
+Functions and the Firebase Blaze billing plan are not required. Both notifications go to
+the same fixed shop address, but use separate templates and separate forms. A booking
+uses the appointment form and booking template; a cart order uses the header cart, a
+separate contact/fulfillment form, and the order template. Each request is saved in
+Firestore first; if email sending fails, the request remains saved and the customer is
+told to call the shop.
 
 1. Create a free account at [EmailJS](https://www.emailjs.com/).
 2. In EmailJS, add an email service and connect the sending mailbox. If you use Gmail,
    authorize it through EmailJS; never put your Gmail password in this project.
-3. Create an email template. Set the **To email** field directly to
-   `alindsindi8@gmail.com` (do not use a customer-provided value for the recipient).
+3. Create a booking email template. Set the **To email** field directly to
+   `alindisindi8@gmail.com` (do not use a customer-provided value for the recipient).
    Include these template variables in the subject/body:
    `{{customer_name}}`, `{{customer_email}}`, `{{customer_phone}}`, `{{service}}`,
    `{{vehicle}}`, `{{date}}`, `{{time}}`, `{{notes}}`, and `{{booking_link}}`.
    A suggested message is: “You have a new booking on your website. Please review it:
    {{booking_link}}”.
-4. In EmailJS account settings, copy the **Public Key**. Also copy the service ID and
-   template ID from their respective pages.
-5. In `index.html`, fill the `serviceId`, `templateId`, and `publicKey` fields in
-   `EMAILJS_CONFIG` with those three values. These are browser-side public identifiers,
-   not passwords. Do not put SMTP passwords, private keys, or other secrets in the page.
-6. Publish the updated website, then submit a test booking. Check
-   **alindsindi8@gmail.com**. The link opens the staff dashboard and, after an authorized
-   staff member signs in, displays that booking’s details.
+4. Create a separate product-order email template using the same fixed **To email**
+   recipient. Include `{{customer_name}}`, `{{customer_email}}`, `{{customer_phone}}`,
+   `{{order_id}}`, `{{items}}`, `{{subtotal}}`, `{{tax}}`, `{{total}}`,
+   `{{fulfillment_method}}`, `{{delivery_location}}`, `{{vehicle}}`, `{{notes}}`, and
+   `{{order_link}}`. Give it a distinct subject and design so order alerts are easy to
+   distinguish from booking alerts.
+5. In EmailJS account settings, copy the **Public Key**. Also copy the service ID and
+   both template IDs from their respective pages.
+6. In `index.html`, fill `serviceId`, `templateId` (booking), `orderTemplateId` (product
+   orders), and `publicKey` in `EMAILJS_CONFIG`. These are browser-side public
+   identifiers, not passwords. Do not put SMTP passwords, private keys, or other
+   secrets in the page.
+7. Publish the updated website, then submit a test booking and a separate test cart
+   order. Check
+   **alindisindi8@gmail.com**. The link opens the staff dashboard and, after an authorized
+   staff member signs in, displays the request details.
 
 Because EmailJS sends from the browser, set its allowed origins/domain restrictions in
 the EmailJS dashboard to your website domain, and keep the template recipient fixed to
