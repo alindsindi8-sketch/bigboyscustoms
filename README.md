@@ -7,6 +7,8 @@ Email **Bigboyscustoms@live.com** · [Instagram](https://www.instagram.com/bigbo
 This workspace currently runs as one `index.html` file with hash-based Home, Shop,
 Services, Why Us, Contact, and Staff Dashboard views. It includes separate customer
 booking and cart-order forms, plus Firebase-backed product and stock management.
+In the staff dashboard, product orders and service bookings are shown on separate
+Product orders and Service bookings screens.
 
 **Firebase is already configured in this copy.** The public web config values in the
 inline `FIREBASE_CONFIG` object in `index.html` are present. Publish the rules in
@@ -123,8 +125,10 @@ Functions and the Firebase Blaze billing plan are not required. Both notificatio
 the same fixed shop address, but use separate templates and separate forms. A booking
 uses the appointment form and booking template; a cart order uses the header cart, a
 separate contact/fulfillment form, and the order template. Each request is saved in
-Firestore first; if email sending fails, the request remains saved and the customer is
-told to call the shop.
+Firestore first. Product orders appear in the staff dashboard and trigger an owner email.
+When staff confirm a product order, the site sends the customer an order-confirmation
+email with the order items, fulfillment details, and stored total. Email failures do not
+undo a saved or confirmed order; the dashboard reports a failed confirmation email.
 
 1. Create a free account at [EmailJS](https://www.emailjs.com/).
 2. In EmailJS, add an email service and connect the sending mailbox. If you use Gmail,
@@ -138,20 +142,29 @@ told to call the shop.
    {{booking_link}}”.
 4. Create a separate product-order email template using the same fixed **To email**
    recipient. Include `{{customer_name}}`, `{{customer_email}}`, `{{customer_phone}}`,
-   `{{order_id}}`, `{{items}}`, `{{subtotal}}`, `{{tax}}`, `{{total}}`,
+   `{{order_id}}`, `{{items}}`, `{{items_html}}`, `{{subtotal}}`, `{{tax}}`, `{{total}}`,
    `{{fulfillment_method}}`, `{{delivery_location}}`, `{{vehicle}}`, `{{notes}}`, and
    `{{order_link}}`. Give it a distinct subject and design so order alerts are easy to
    distinguish from booking alerts.
-5. In EmailJS account settings, copy the **Public Key**. Also copy the service ID and
-   both template IDs from their respective pages.
-6. In `index.html`, fill `serviceId`, `templateId` (booking), `orderTemplateId` (product
-   orders), and `publicKey` in `EMAILJS_CONFIG`. These are browser-side public
-   identifiers, not passwords. Do not put SMTP passwords, private keys, or other
-   secrets in the page.
-7. Publish the updated website, then submit a test booking and a separate test cart
-   order. Check
-   **alindisindi8@gmail.com**. The link opens the staff dashboard and, after an authorized
-   staff member signs in, displays the request details.
+5. Create a third template for **customer order confirmations**. Set its **To email**
+   field to `{{to_email}}`. Include `{{customer_name}}`, `{{customer_email}}`,
+   `{{customer_phone}}`, `{{order_id}}`, `{{items}}`, `{{items_html}}`, `{{subtotal}}`, `{{tax}}`,
+   `{{total}}`, `{{fulfillment_method}}`, `{{delivery_location}}`, `{{vehicle}}`,
+   `{{notes}}`, and `{{order_status}}`. The customer email is sent only after staff
+   confirm a pending product order in the dashboard. Add `{{items_html}}` in the
+   template's HTML body where the formatted product list and available product photos
+   should appear. Email apps may block embedded image data; use publicly hosted image
+   URLs if a recipient's email app does not display those photos.
+6. In EmailJS account settings, copy the **Public Key**. Also copy the service ID and
+   all three template IDs from their respective pages.
+7. In `index.html`, set `serviceId`, `templateId` (booking), `orderTemplateId` (owner
+   product-order alert), `orderConfirmationTemplateId` (customer confirmation), and
+   `publicKey` in `EMAILJS_CONFIG`. These are browser-side public identifiers, not
+   passwords. Do not put SMTP passwords, private keys, or other secrets in the page.
+8. Publish the updated website. Submit a test cart order and check the owner inbox,
+   then sign in to the staff dashboard and confirm that order. Check the customer's
+   inbox for the confirmation and verify the items and total. Check Spam and EmailJS
+   Email History if either message does not arrive.
 
 Because EmailJS sends from the browser, set its allowed origins/domain restrictions in
 the EmailJS dashboard to your website domain, and keep the template recipient fixed to

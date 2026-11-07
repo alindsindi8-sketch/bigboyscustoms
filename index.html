@@ -484,6 +484,10 @@ body[data-view="admin"] main>section[data-view="admin"]{animation:bbSectionEnter
   background:linear-gradient(180deg,var(--bb-charcoal),var(--bb-black-soft));box-shadow:var(--bb-shadow-sm)}
 .bb-admin-panel h3{margin:0 0 16px;font-size:1.1rem;text-transform:uppercase}
 .bb-admin-top{display:flex;align-items:flex-start;justify-content:space-between;gap:16px;flex-wrap:wrap}
+.bb-admin-tabs{display:flex;gap:8px;flex-wrap:wrap;margin:0 0 20px;padding-bottom:12px;border-bottom:1px solid var(--bb-line)}
+.bb-admin-tabs button{padding:9px 14px;border:1px solid var(--bb-line-strong);border-radius:999px;background:var(--bb-glass);color:var(--bb-silver);font:inherit;font-size:.86rem}
+.bb-admin-tabs button:hover,.bb-admin-tabs button.active{border-color:var(--bb-jade);background:rgba(90,208,127,.1);color:var(--bb-white)}
+.bb-admin-panel [role="tabpanel"]>h3{margin:0 0 12px}
 .bb-admin-table-wrap{width:100%;overflow:auto}
 .bb-admin-table{width:100%;min-width:620px;border-collapse:collapse;font-size:.88rem}
 .bb-admin-table th,.bb-admin-table td{padding:12px 10px;border-bottom:1px solid var(--bb-line);text-align:left;vertical-align:middle}
@@ -1059,11 +1063,23 @@ body[data-view="admin"] .bb-footer,body[data-view="admin"] .bb-to-top{display:no
           <div class="bb-admin-table-wrap"><table class="bb-admin-table"><thead><tr><th>Product</th><th>SKU / fitment</th><th>Price</th><th>Stock</th><th>Actions</th></tr></thead><tbody id="bb-adminProducts"></tbody></table></div>
           <div class="bb-admin-empty" id="bb-adminProductsEmpty" hidden>No inventory products yet. Add a product above.</div>
         </div>
-        <div class="bb-admin-panel">
-          <h3>Orders &amp; bookings</h3>
-          <p class="bb-muted">Customer details update live and are only loaded after authorized staff sign in. Confirm orders and print or download a branded receipt.</p>
-          <div class="bb-admin-table-wrap"><table class="bb-admin-table"><thead><tr><th>Customer / location</th><th>Order</th><th>Request / date</th><th>Status</th><th>Actions</th></tr></thead><tbody id="bb-adminOrders"></tbody></table></div>
-          <div class="bb-admin-empty" id="bb-adminOrdersEmpty" hidden>No orders or booking requests yet.</div>
+        <div class="bb-admin-panel" id="bb-adminRequests">
+          <h3>Customer requests</h3>
+          <p class="bb-muted">Orders and service bookings are shown on separate screens. Customer details are only loaded after authorized staff sign in.</p>
+          <div class="bb-admin-tabs" role="tablist" aria-label="Customer request screens">
+            <button class="active" id="bb-adminOrdersTab" type="button" role="tab" aria-selected="true" aria-controls="bb-adminOrdersScreen">Product orders</button>
+            <button id="bb-adminBookingsTab" type="button" role="tab" aria-selected="false" aria-controls="bb-adminBookingsScreen">Service bookings</button>
+          </div>
+          <section id="bb-adminOrdersScreen" role="tabpanel" aria-labelledby="bb-adminOrdersTab">
+            <h3>Product orders</h3>
+            <div class="bb-admin-table-wrap"><table class="bb-admin-table"><thead><tr><th>Customer / location</th><th>Order</th><th>Request / date</th><th>Status</th><th>Actions</th></tr></thead><tbody id="bb-adminOrders"></tbody></table></div>
+            <div class="bb-admin-empty" id="bb-adminOrdersEmpty" hidden>No product orders yet.</div>
+          </section>
+          <section id="bb-adminBookingsScreen" role="tabpanel" aria-labelledby="bb-adminBookingsTab" hidden>
+            <h3>Service bookings</h3>
+            <div class="bb-admin-table-wrap"><table class="bb-admin-table"><thead><tr><th>Customer / location</th><th>Booking</th><th>Request / date</th><th>Status</th><th>Actions</th></tr></thead><tbody id="bb-adminBookings"></tbody></table></div>
+            <div class="bb-admin-empty" id="bb-adminBookingsEmpty" hidden>No service bookings yet.</div>
+          </section>
         </div>
         <p class="bb-form-note" id="bb-adminMessage" role="status" aria-live="polite"></p>
       </div>
@@ -1881,6 +1897,7 @@ body[data-view="admin"] .bb-footer,body[data-view="admin"] .bb-to-top{display:no
     serviceId: 'service_30fz8li',
     templateId: 'template_j1enomt',
     orderTemplateId: 'template_0qf1bal',
+    orderConfirmationTemplateId: 'template_ku28e6y',
     publicKey: 'i0TVrEsDLwmkCVg5Q'
   };
   const OWNER_EMAIL = 'alindisindi8@gmail.com';
@@ -1928,6 +1945,26 @@ body[data-view="admin"] .bb-footer,body[data-view="admin"] .bb-to-top{display:no
     node.textContent = window.BBApp ? window.BBApp.translate(text || '') : (text || '');
     node.style.color = error ? 'var(--bb-red-bright)' : 'var(--bb-jade)';
   }
+  function emailErrorDetails(error) {
+    if (!error || typeof error !== 'object') return error instanceof Error ? error.message : String(error);
+    const status = Number(error.status);
+    const details = [];
+    ['text', 'message', 'error', 'reason', 'details'].forEach((key) => {
+      const value = error[key];
+      if (value == null || value === '') return;
+      let detail = typeof value === 'string' ? value.trim() : '';
+      if (!detail) {
+        try {
+          detail = JSON.stringify(value);
+        } catch {
+          detail = String(value);
+        }
+      }
+      if (detail && !details.includes(detail)) details.push(detail);
+    });
+    const response = details.join(' | ') || 'EmailJS returned an empty error response.';
+    return (Number.isFinite(status) ? 'HTTP ' + status + ': ' : '') + response;
+  }
   function html(value) {
     return String(value == null ? '' : value).replace(/[&<>"']/g, (char) => ({
       '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;'
@@ -1935,6 +1972,20 @@ body[data-view="admin"] .bb-footer,body[data-view="admin"] .bb-to-top{display:no
   }
   function money(value) {
     return '$' + (Number(value) || 0).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+  }
+  function orderEmailItems(items) {
+    return items.map((item) => {
+      const image = typeof item.imageData === 'string' &&
+        /^data:image\/(?:png|jpeg|webp);base64,[A-Za-z0-9+/=]+$/.test(item.imageData) ?
+        '<img src="' + html(item.imageData) + '" alt="' + html(item.name) +
+          '" width="96" style="display:block;width:96px;height:auto;border:0;margin:0 12px 0 0;">' : '';
+      return '<div style="display:flex;align-items:center;margin:0 0 16px;">' + image +
+        '<div><strong>' + html(item.name) + '</strong><br>Qty ' + html(item.quantity) +
+        ' &middot; ' + money(item.price) + ' each<br>Line total: ' +
+        money(item.price * item.quantity) +
+        (item.size ? '<br>Size: ' + html(item.size) : '') +
+        (item.sku ? '<br>SKU: ' + html(item.sku) : '') + '</div></div>';
+    }).join('');
   }
   function stockAvailability(stock) {
     if (!Number.isInteger(stock) || stock < 0 || stock > 1000000) {
@@ -2161,10 +2212,7 @@ body[data-view="admin"] .bb-footer,body[data-view="admin"] .bb-to-top{display:no
   }
   function showOrders(orders) {
     currentOrders = new Map(orders.map((order) => [order.id, order]));
-    const tbody = $('#bb-adminOrders');
-    const empty = $('#bb-adminOrdersEmpty');
-    if (!tbody) return;
-    tbody.innerHTML = orders.map((order) => {
+    const renderRows = (requests) => requests.map((order) => {
       const customer = order.customer || {};
       const booking = order.booking || {};
       const items = order.items || [];
@@ -2194,7 +2242,12 @@ body[data-view="admin"] .bb-footer,body[data-view="admin"] .bb-to-top{display:no
         '<button type="button" data-order-action="delete" data-id="' + html(order.id) + '">' + window.BBApp.translate('Delete') + '</button>' +
         '</div></td></tr>';
     }).join('');
-    if (empty) empty.hidden = orders.length > 0;
+    const productOrders = orders.filter((order) => order.type === 'product-order');
+    const bookings = orders.filter((order) => order.type !== 'product-order');
+    $('#bb-adminOrders').innerHTML = renderRows(productOrders);
+    $('#bb-adminBookings').innerHTML = renderRows(bookings);
+    $('#bb-adminOrdersEmpty').hidden = productOrders.length > 0;
+    $('#bb-adminBookingsEmpty').hidden = bookings.length > 0;
     const requestedBookingId = new URLSearchParams(window.location.hash.split('?')[1] || '').get('booking');
     const requestedOrder = requestedBookingId && currentOrders.get(requestedBookingId);
     if (requestedOrder) {
@@ -2309,6 +2362,20 @@ body[data-view="admin"] .bb-footer,body[data-view="admin"] .bb-to-top{display:no
     showOrders(Array.from(currentOrders.values()));
     renderCart();
   });
+  const requestTabs = [
+    { button: $('#bb-adminOrdersTab'), screen: $('#bb-adminOrdersScreen') },
+    { button: $('#bb-adminBookingsTab'), screen: $('#bb-adminBookingsScreen') }
+  ];
+  requestTabs.forEach(({ button }) => {
+    button.addEventListener('click', () => {
+      requestTabs.forEach(({ button: tabButton, screen }) => {
+        const selected = tabButton === button;
+        tabButton.classList.toggle('active', selected);
+        tabButton.setAttribute('aria-selected', String(selected));
+        screen.hidden = !selected;
+      });
+    });
+  });
   function clearListeners() {
     if (stopOrders) stopOrders();
     if (stopInventory) stopInventory();
@@ -2406,6 +2473,7 @@ body[data-view="admin"] .bb-footer,body[data-view="admin"] .bb-to-top{display:no
           nameEs: product.nameEs || product.name,
           size: product.size || '',
           sku: product.sku || '',
+          imageData: product.imageData || '',
           inventory: true
         };
       });
@@ -2626,7 +2694,7 @@ body[data-view="admin"] .bb-footer,body[data-view="admin"] .bb-to-top{display:no
             alert('Your booking request was sent to BIGBOYS CUSTOMS. The shop will contact you to confirm the visit.');
           } catch (emailError) {
             console.error('Booking was saved, but the owner email notification failed.', emailError);
-            const reason = emailError instanceof Error ? emailError.message : String(emailError);
+            const reason = emailErrorDetails(emailError);
             alert('Your booking was saved, but the owner email could not be sent. EmailJS error: ' + reason + '. Check the EmailJS service, booking template recipient, allowed domain, and free-tier limit.');
           }
         } catch (error) {
@@ -2689,7 +2757,7 @@ body[data-view="admin"] .bb-footer,body[data-view="admin"] .bb-to-top{display:no
               phone: String(values.get('phone')).trim(),
               email: String(values.get('email')).trim()
             },
-            items: orderItems,
+            items: orderItems.map(({ imageData, ...item }) => item),
             fulfillment: fulfillment,
             vehicle: String(values.get('vehicle') || '').trim(),
             notes: notes,
@@ -2716,6 +2784,7 @@ body[data-view="admin"] .bb-footer,body[data-view="admin"] .bb-to-top{display:no
             const itemDetails = orderItems.map((item) =>
               item.name + ' | Qty ' + item.quantity + ' | ' + money(item.price) + ' each | ' + money(item.price * item.quantity)
             ).join('\n');
+            const itemDetailsHtml = orderEmailItems(orderItems);
             await emailjs.send(EMAILJS_CONFIG.serviceId, EMAILJS_CONFIG.orderTemplateId, {
               to_email: OWNER_EMAIL,
               owner_email: OWNER_EMAIL,
@@ -2725,6 +2794,7 @@ body[data-view="admin"] .bb-footer,body[data-view="admin"] .bb-to-top{display:no
               customer_phone: String(values.get('phone')).trim(),
               items: itemDetails,
               item_details: itemDetails,
+              items_html: itemDetailsHtml,
               subtotal: money(amount),
               tax: money(0),
               total: money(amount),
@@ -2732,12 +2802,20 @@ body[data-view="admin"] .bb-footer,body[data-view="admin"] .bb-to-top{display:no
               delivery_location: deliveryLocation,
               vehicle: String(values.get('vehicle') || '').trim() || 'Not specified',
               notes: notes || 'None',
+              name: String(values.get('name')).trim(),
+              phone: String(values.get('phone')).trim(),
+              email: String(values.get('email')).trim(),
+              delivery_method: fulfillment.method,
+              street_address: fulfillment.address,
+              city: fulfillment.city,
+              state: fulfillment.state,
+              zip_code: fulfillment.zip,
               order_link: orderLink
             }, { publicKey: EMAILJS_CONFIG.publicKey });
             alert('Your order request was sent to BIGBOYS CUSTOMS. The shop will contact you to confirm stock, delivery, and final pricing.');
           } catch (emailError) {
             console.error('Order was saved, but the owner email notification failed.', emailError);
-            const reason = emailError instanceof Error ? emailError.message : String(emailError);
+            const reason = emailErrorDetails(emailError);
             alert('Your order was saved, but the owner email could not be sent. EmailJS error: ' + reason + '. Check the EmailJS service, order template recipient, allowed domain, and free-tier limit.');
           }
         } catch (error) {
@@ -2912,7 +2990,7 @@ body[data-view="admin"] .bb-footer,body[data-view="admin"] .bb-to-top{display:no
           message($('#bb-productMessage'), 'Product could not be deleted: ' + error.message, true);
         }
       });
-      $('#bb-adminOrders').addEventListener('click', async (event) => {
+      $('#bb-adminRequests').addEventListener('click', async (event) => {
         const button = event.target.closest('[data-order-action]');
         if (!button) return;
         const order = currentOrders.get(button.dataset.id);
@@ -3012,7 +3090,61 @@ body[data-view="admin"] .bb-footer,body[data-view="admin"] .bb-to-top{display:no
               }
             });
           }
-          message($('#bb-adminMessage'), 'Booking updated.');
+          if (action === 'confirm' && order.type === 'product-order') {
+            try {
+              if (!EMAILJS_CONFIG.serviceId || !EMAILJS_CONFIG.orderConfirmationTemplateId || !EMAILJS_CONFIG.publicKey) {
+                throw new Error('Add the order confirmation template ID to EMAILJS_CONFIG in index.html.');
+              }
+              const customerEmail = String(order.customer && order.customer.email || '').trim();
+              if (!customerEmail) throw new Error('This order does not have a customer email address.');
+              const emailjs = await import('https://cdn.jsdelivr.net/npm/@emailjs/browser@4/+esm');
+              const deliveryLocation = order.fulfillment && order.fulfillment.method === 'delivery' ?
+                [order.fulfillment.address, order.fulfillment.city, order.fulfillment.state, order.fulfillment.zip]
+                  .filter(Boolean).join(', ') :
+                'Pickup at BIGBOYS CUSTOMS, 3100 Mansfield Hwy, Forest Hill, TX 76119';
+              const itemDetails = (order.items || []).map((item) =>
+                item.name + ' | Qty ' + item.quantity + ' | ' + money(item.price) + ' each | ' +
+                money(item.price * item.quantity)
+              ).join('\n');
+              const emailItems = (order.items || []).map((item) => {
+                const product = catalog.find((entry) => entry.id === item.id);
+                return { ...item, imageData: product && product.imageData || '' };
+              });
+              const itemDetailsHtml = orderEmailItems(emailItems);
+              await emailjs.send(EMAILJS_CONFIG.serviceId, EMAILJS_CONFIG.orderConfirmationTemplateId, {
+                to_email: customerEmail,
+                customer_email: customerEmail,
+                customer_name: String(order.customer && order.customer.name || 'Customer'),
+                customer_phone: String(order.customer && order.customer.phone || ''),
+                order_id: order.id,
+                items: itemDetails,
+                items_html: itemDetailsHtml,
+                subtotal: money(order.subtotal),
+                tax: money(order.tax),
+                total: money(order.total),
+                fulfillment_method: String(order.fulfillment && order.fulfillment.method || 'pickup'),
+                delivery_location: deliveryLocation,
+                vehicle: String(order.vehicle || 'Not specified'),
+                notes: String(order.notes || 'None'),
+                name: String(order.customer && order.customer.name || 'Customer'),
+                phone: String(order.customer && order.customer.phone || ''),
+                email: customerEmail,
+                delivery_method: String(order.fulfillment && order.fulfillment.method || 'pickup'),
+                street_address: String(order.fulfillment && order.fulfillment.address || ''),
+                city: String(order.fulfillment && order.fulfillment.city || ''),
+                state: String(order.fulfillment && order.fulfillment.state || ''),
+                zip_code: String(order.fulfillment && order.fulfillment.zip || ''),
+                order_status: 'Confirmed'
+              }, { publicKey: EMAILJS_CONFIG.publicKey });
+            } catch (emailError) {
+              console.error('Order was confirmed, but the customer confirmation email failed.', emailError);
+              message($('#bb-adminMessage'),
+                'Order confirmed, but customer email could not be sent: ' + emailErrorDetails(emailError), true);
+              return;
+            }
+          }
+          message($('#bb-adminMessage'), action === 'confirm' && order.type === 'product-order' ?
+            'Order confirmed and confirmation email sent to the customer.' : 'Booking updated.');
         } catch (error) {
           message($('#bb-adminMessage'), 'Booking could not be updated: ' + error.message, true);
         }
@@ -3056,7 +3188,7 @@ body[data-view="admin"] .bb-footer,body[data-view="admin"] .bb-to-top{display:no
           stopOrders = firebase.onSnapshot(
             firebase.query(firebase.collection(db, 'orders'), firebase.orderBy('createdAt', 'desc')),
             (snapshot) => showOrders(snapshot.docs.map((entry) => ({ id: entry.id, ...entry.data() }))),
-            (error) => message($('#bb-adminMessage'), 'Booking listener error: ' + error.message, true)
+            (error) => message($('#bb-adminMessage'), 'Order and booking listener error: ' + error.message, true)
           );
         } catch (error) {
           message(loginMessage, 'Could not verify staff access: ' + error.message, true);
