@@ -141,20 +141,25 @@ undo a saved or confirmed order; the dashboard reports a failed confirmation ema
    A suggested message is: “You have a new booking on your website. Please review it:
    {{booking_link}}”.
 4. Create a separate product-order email template using the same fixed **To email**
-   recipient. Include `{{customer_name}}`, `{{customer_email}}`, `{{customer_phone}}`,
+   recipient; do not use `{{email}}` or `{{customer_email}}` as its recipient. In the
+   message body, use `{{customer_email}}` or `{{email}}` to display the buyer's address.
+   Include `{{customer_name}}`, `{{customer_email}}`, `{{customer_phone}}`,
    `{{order_id}}`, `{{items}}`, `{{items_html}}`, `{{subtotal}}`, `{{tax}}`, `{{total}}`,
    `{{fulfillment_method}}`, `{{delivery_location}}`, `{{vehicle}}`, `{{notes}}`, and
-   `{{order_link}}`. Give it a distinct subject and design so order alerts are easy to
-   distinguish from booking alerts.
+   `{{order_link}}`. The site also sends an `orders` list with `name`, `quantity`,
+   `price`, `line_total`, `size`, `sku`, and `image_url` for each product. Use EmailJS
+   loop syntax such as `{{#orders}}...{{/orders}}` to render those item details. Product
+   photos in email require a public HTTPS image URL; private Firestore image data is not
+   embedded in email variables. Give the template a distinct subject so order alerts are
+   easy to distinguish from booking alerts.
 5. Create a third template for **customer order confirmations**. Set its **To email**
    field to `{{to_email}}`. Include `{{customer_name}}`, `{{customer_email}}`,
    `{{customer_phone}}`, `{{order_id}}`, `{{items}}`, `{{items_html}}`, `{{subtotal}}`, `{{tax}}`,
    `{{total}}`, `{{fulfillment_method}}`, `{{delivery_location}}`, `{{vehicle}}`,
    `{{notes}}`, and `{{order_status}}`. The customer email is sent only after staff
    confirm a pending product order in the dashboard. Add `{{items_html}}` in the
-   template's HTML body where the formatted product list and available product photos
-   should appear. Email apps may block embedded image data; use publicly hosted image
-   URLs if a recipient's email app does not display those photos.
+   template's HTML body where the formatted product list should appear, or use the
+   `orders` loop to customize the item layout. Use public HTTPS image URLs for photos.
 6. In EmailJS account settings, copy the **Public Key**. Also copy the service ID and
    all three template IDs from their respective pages.
 7. In `index.html`, set `serviceId`, `templateId` (booking), `orderTemplateId` (owner

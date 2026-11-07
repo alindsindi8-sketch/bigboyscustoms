@@ -1975,9 +1975,8 @@ body[data-view="admin"] .bb-footer,body[data-view="admin"] .bb-to-top{display:no
   }
   function orderEmailItems(items) {
     return items.map((item) => {
-      const image = typeof item.imageData === 'string' &&
-        /^data:image\/(?:png|jpeg|webp);base64,[A-Za-z0-9+/=]+$/.test(item.imageData) ?
-        '<img src="' + html(item.imageData) + '" alt="' + html(item.name) +
+      const image = typeof item.imageUrl === 'string' && /^https:\/\/\S+$/i.test(item.imageUrl) ?
+        '<img src="' + html(item.imageUrl) + '" alt="' + html(item.name) +
           '" width="96" style="display:block;width:96px;height:auto;border:0;margin:0 12px 0 0;">' : '';
       return '<div style="display:flex;align-items:center;margin:0 0 16px;">' + image +
         '<div><strong>' + html(item.name) + '</strong><br>Qty ' + html(item.quantity) +
@@ -2473,6 +2472,8 @@ body[data-view="admin"] .bb-footer,body[data-view="admin"] .bb-to-top{display:no
           nameEs: product.nameEs || product.name,
           size: product.size || '',
           sku: product.sku || '',
+          imageUrl: typeof product.imageUrl === 'string' && /^https:\/\/\S+$/i.test(product.imageUrl) ?
+            product.imageUrl : '',
           imageData: product.imageData || '',
           inventory: true
         };
@@ -2785,6 +2786,15 @@ body[data-view="admin"] .bb-footer,body[data-view="admin"] .bb-to-top{display:no
               item.name + ' | Qty ' + item.quantity + ' | ' + money(item.price) + ' each | ' + money(item.price * item.quantity)
             ).join('\n');
             const itemDetailsHtml = orderEmailItems(orderItems);
+            const orderEmailRows = orderItems.map((item) => ({
+              name: item.name,
+              quantity: item.quantity,
+              price: money(item.price),
+              line_total: money(item.price * item.quantity),
+              size: item.size || '',
+              sku: item.sku || '',
+              image_url: typeof item.imageUrl === 'string' && /^https:\/\/\S+$/i.test(item.imageUrl) ? item.imageUrl : ''
+            }));
             await emailjs.send(EMAILJS_CONFIG.serviceId, EMAILJS_CONFIG.orderTemplateId, {
               to_email: OWNER_EMAIL,
               owner_email: OWNER_EMAIL,
@@ -2795,6 +2805,7 @@ body[data-view="admin"] .bb-footer,body[data-view="admin"] .bb-to-top{display:no
               items: itemDetails,
               item_details: itemDetails,
               items_html: itemDetailsHtml,
+              orders: orderEmailRows,
               subtotal: money(amount),
               tax: money(0),
               total: money(amount),
@@ -3108,9 +3119,18 @@ body[data-view="admin"] .bb-footer,body[data-view="admin"] .bb-to-top{display:no
               ).join('\n');
               const emailItems = (order.items || []).map((item) => {
                 const product = catalog.find((entry) => entry.id === item.id);
-                return { ...item, imageData: product && product.imageData || '' };
+                return { ...item, imageUrl: product && product.imageUrl || '' };
               });
               const itemDetailsHtml = orderEmailItems(emailItems);
+              const orderEmailRows = emailItems.map((item) => ({
+                name: item.name,
+                quantity: item.quantity,
+                price: money(item.price),
+                line_total: money(item.price * item.quantity),
+                size: item.size || '',
+                sku: item.sku || '',
+                image_url: typeof item.imageUrl === 'string' && /^https:\/\/\S+$/i.test(item.imageUrl) ? item.imageUrl : ''
+              }));
               await emailjs.send(EMAILJS_CONFIG.serviceId, EMAILJS_CONFIG.orderConfirmationTemplateId, {
                 to_email: customerEmail,
                 customer_email: customerEmail,
@@ -3119,6 +3139,7 @@ body[data-view="admin"] .bb-footer,body[data-view="admin"] .bb-to-top{display:no
                 order_id: order.id,
                 items: itemDetails,
                 items_html: itemDetailsHtml,
+                orders: orderEmailRows,
                 subtotal: money(order.subtotal),
                 tax: money(order.tax),
                 total: money(order.total),
