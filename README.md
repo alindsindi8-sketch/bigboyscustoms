@@ -139,7 +139,10 @@ dashboard reports a failed confirmation email.
    confirm the booking. Use neutral wording such as “Booking update” and show
    `{{booking_status}}` so the same template indicates whether a request is pending or
    reviewed and confirmed. The confirmation email is sent only to the customer; leave
-   the template's CC and BCC fields empty if the owner should not receive it. Include
+   the template's CC and BCC fields empty if the owner should not receive it. Set the
+   template's **From Name** to `BIG BOYS CUSTOMS` and use the sender mailbox connected
+   to your EmailJS service for **From Email**; `{{to_email}}` is the recipient, not the
+   sender. Include
    `{{booking_details}}` in the email body to show the full booking in one
    readable block, including customer contact details, service, pickup/delivery
    location, vehicle, preferred date and time, and notes. You can also use
