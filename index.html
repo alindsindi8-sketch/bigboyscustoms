@@ -1986,6 +1986,17 @@ body[data-view="admin"] .bb-footer,body[data-view="admin"] .bb-to-top{display:no
         (item.sku ? '<br>SKU: ' + html(item.sku) : '') + '</div></div>';
     }).join('');
   }
+  function orderEmailRows(items) {
+    return items.map((item) => ({
+      name: item.name,
+      quantity: item.quantity,
+      price: money(item.price),
+      line_total: money(item.price * item.quantity),
+      size: item.size || '',
+      sku: item.sku || '',
+      image_url: typeof item.imageUrl === 'string' && /^https:\/\/\S+$/i.test(item.imageUrl) ? item.imageUrl : ''
+    }));
+  }
   function stockAvailability(stock) {
     if (!Number.isInteger(stock) || stock < 0 || stock > 1000000) {
       throw new Error('Inventory has an invalid stock count.');
@@ -2250,6 +2261,13 @@ body[data-view="admin"] .bb-footer,body[data-view="admin"] .bb-to-top{display:no
     const requestedBookingId = new URLSearchParams(window.location.hash.split('?')[1] || '').get('booking');
     const requestedOrder = requestedBookingId && currentOrders.get(requestedBookingId);
     if (requestedOrder) {
+      const showBookings = requestedOrder.type !== 'product-order';
+      $('#bb-adminBookingsTab').classList.toggle('active', showBookings);
+      $('#bb-adminBookingsTab').setAttribute('aria-selected', String(showBookings));
+      $('#bb-adminBookingsScreen').hidden = !showBookings;
+      $('#bb-adminOrdersTab').classList.toggle('active', !showBookings);
+      $('#bb-adminOrdersTab').setAttribute('aria-selected', String(!showBookings));
+      $('#bb-adminOrdersScreen').hidden = showBookings;
       showOrderDetails(requestedOrder);
       window.history.replaceState(null, '', '#admin');
     }
@@ -2296,6 +2314,8 @@ body[data-view="admin"] .bb-footer,body[data-view="admin"] .bb-to-top{display:no
         row('Total', money(order.total)) +
       '</dl>' +
       '<div class="bb-admin-actions" style="margin-top:20px">' +
+        (order.status === 'pending' ? '<button type="button" data-order-action="confirm" data-id="' + html(order.id) + '">' +
+          (order.type === 'product-order' ? 'Confirm order' : 'Confirm booking') + '</button>' : '') +
         '<button type="button" data-receipt-action="download" data-id="' + html(order.id) + '">Download receipt</button>' +
         '<button type="button" data-receipt-action="print" data-id="' + html(order.id) + '">Print receipt</button>' +
       '</div>';
@@ -2621,6 +2641,18 @@ body[data-view="admin"] .bb-footer,body[data-view="admin"] .bb-to-top{display:no
           state: fulfillmentMethod === 'delivery' ? String(values.get('state') || '').trim() : '',
           zip: fulfillmentMethod === 'delivery' ? String(values.get('zip') || '').trim() : ''
         };
+        const customer = {
+          name: String(values.get('name')).trim(),
+          phone: String(values.get('phone')).trim(),
+          email: String(values.get('email')).trim()
+        };
+        const service = String(values.get('service'));
+        const vehicle = String(values.get('vehicle')).trim();
+        const bookingDate = String(values.get('date'));
+        const bookingTime = String(values.get('time'));
+        const deliveryLocation = fulfillment.method === 'delivery' ?
+          [fulfillment.address, fulfillment.city, fulfillment.state, fulfillment.zip].join(', ') :
+          'Pickup at BIGBOYS CUSTOMS, 3100 Mansfield Hwy, Forest Hill, TX 76119';
         if (!['pickup', 'delivery'].includes(fulfillmentMethod) ||
             (fulfillmentMethod === 'delivery' && (!fulfillment.address || !fulfillment.city || !fulfillment.state || !fulfillment.zip))) {
           message(bookingMessage, 'Enter the full delivery address, city, state, and ZIP code.', true);
@@ -2634,19 +2666,15 @@ body[data-view="admin"] .bb-footer,body[data-view="admin"] .bb-to-top{display:no
           const order = await firebase.addDoc(firebase.collection(db, 'orders'), {
             type: 'booking',
             status: 'pending',
-            customer: {
-              name: String(values.get('name')).trim(),
-              phone: String(values.get('phone')).trim(),
-              email: String(values.get('email')).trim()
-            },
+            customer: customer,
             items: orderItems,
             fulfillment: fulfillment,
             booking: {
-              service: String(values.get('service')),
+              service: service,
               year: year,
-              vehicle: String(values.get('vehicle')).trim(),
-              date: String(values.get('date')),
-              time: String(values.get('time')),
+              vehicle: vehicle,
+              date: bookingDate,
+              time: bookingTime,
               notes: notes
             },
             notes: notes,
@@ -2664,33 +2692,64 @@ body[data-view="admin"] .bb-footer,body[data-view="admin"] .bb-to-top{display:no
               return;
             }
             const emailjs = await import('https://cdn.jsdelivr.net/npm/@emailjs/browser@4/+esm');
-            const bookingLink = new URL('/#admin?booking=' + encodeURIComponent(order.id), window.location.origin).toString();
-            const deliveryLocation = fulfillment.method === 'delivery' ?
-              [fulfillment.address, fulfillment.city, fulfillment.state, fulfillment.zip].join(', ') :
-              'Pickup at BIGBOYS CUSTOMS, 3100 Mansfield Hwy, Forest Hill, TX 76119';
+            const bookingUrl = new URL(window.location.href);
+            bookingUrl.hash = 'admin?booking=' + encodeURIComponent(order.id);
+            const bookingLink = bookingUrl.toString();
             const itemDetails = orderItems.map((item) =>
               item.name + ' | Qty ' + item.quantity + ' | ' + money(item.price) + ' each | ' + money(item.price * item.quantity)
             ).join('\n');
+            const bookingDetails = [
+              'Booking ID: ' + order.id,
+              'Status: Pending confirmation',
+              'Customer name: ' + customer.name,
+              'Customer email: ' + customer.email,
+              'Customer phone: ' + customer.phone,
+              'Service: ' + service,
+              'Pickup or delivery: ' + fulfillment.method,
+              'Location: ' + deliveryLocation,
+              'Vehicle: ' + year + ' ' + vehicle,
+              'Preferred date: ' + bookingDate,
+              'Preferred time: ' + bookingTime,
+              'Details / questions: ' + (notes || 'None')
+            ].join('\n');
+            const itemDetailsHtml = orderEmailItems(orderItems);
+            const bookingItems = orderEmailRows(orderItems);
             await emailjs.send(EMAILJS_CONFIG.serviceId, EMAILJS_CONFIG.templateId, {
               to_email: OWNER_EMAIL,
               owner_email: OWNER_EMAIL,
               order_id: order.id,
-              customer_name: String(values.get('name')).trim(),
-              customer_email: String(values.get('email')).trim(),
-              customer_phone: String(values.get('phone')).trim(),
+              order_status: 'Pending confirmation',
+              booking_status: 'Pending confirmation',
+              customer_name: customer.name,
+              customer_email: customer.email,
+              customer_phone: customer.phone,
+              name: customer.name,
+              email: customer.email,
+              phone: customer.phone,
               items: itemDetails,
               item_details: itemDetails,
+              items_html: itemDetailsHtml,
+              orders: bookingItems,
+              booking_details: bookingDetails,
               subtotal: money(amount),
               tax: money(0),
               total: money(amount),
               fulfillment_method: fulfillment.method,
+              delivery_method: fulfillment.method,
               delivery_location: deliveryLocation,
-              service: String(values.get('service')),
-              vehicle: year + ' ' + String(values.get('vehicle')).trim(),
-              date: String(values.get('date')),
-              time: String(values.get('time')),
+              street_address: fulfillment.address,
+              city: fulfillment.city,
+              state: fulfillment.state,
+              zip_code: fulfillment.zip,
+              service: service,
+              vehicle_year: year,
+              vehicle_make_model: vehicle,
+              vehicle: year + ' ' + vehicle,
+              date: bookingDate,
+              time: bookingTime,
               notes: notes || 'None',
-              booking_link: bookingLink
+              booking_link: bookingLink,
+              order_link: bookingLink
             }, { publicKey: EMAILJS_CONFIG.publicKey });
             alert('Your booking request was sent to BIGBOYS CUSTOMS. The shop will contact you to confirm the visit.');
           } catch (emailError) {
@@ -2786,15 +2845,7 @@ body[data-view="admin"] .bb-footer,body[data-view="admin"] .bb-to-top{display:no
               item.name + ' | Qty ' + item.quantity + ' | ' + money(item.price) + ' each | ' + money(item.price * item.quantity)
             ).join('\n');
             const itemDetailsHtml = orderEmailItems(orderItems);
-            const orderEmailRows = orderItems.map((item) => ({
-              name: item.name,
-              quantity: item.quantity,
-              price: money(item.price),
-              line_total: money(item.price * item.quantity),
-              size: item.size || '',
-              sku: item.sku || '',
-              image_url: typeof item.imageUrl === 'string' && /^https:\/\/\S+$/i.test(item.imageUrl) ? item.imageUrl : ''
-            }));
+            const orderEmailRowsList = orderEmailRows(orderItems);
             await emailjs.send(EMAILJS_CONFIG.serviceId, EMAILJS_CONFIG.orderTemplateId, {
               to_email: OWNER_EMAIL,
               owner_email: OWNER_EMAIL,
@@ -2805,7 +2856,7 @@ body[data-view="admin"] .bb-footer,body[data-view="admin"] .bb-to-top{display:no
               items: itemDetails,
               item_details: itemDetails,
               items_html: itemDetailsHtml,
-              orders: orderEmailRows,
+              orders: orderEmailRowsList,
               subtotal: money(amount),
               tax: money(0),
               total: money(amount),
@@ -3001,7 +3052,7 @@ body[data-view="admin"] .bb-footer,body[data-view="admin"] .bb-to-top{display:no
           message($('#bb-productMessage'), 'Product could not be deleted: ' + error.message, true);
         }
       });
-      $('#bb-adminRequests').addEventListener('click', async (event) => {
+      page.addEventListener('click', async (event) => {
         const button = event.target.closest('[data-order-action]');
         if (!button) return;
         const order = currentOrders.get(button.dataset.id);
@@ -3159,13 +3210,93 @@ body[data-view="admin"] .bb-footer,body[data-view="admin"] .bb-to-top{display:no
               }, { publicKey: EMAILJS_CONFIG.publicKey });
             } catch (emailError) {
               console.error('Order was confirmed, but the customer confirmation email failed.', emailError);
+              if (button.closest('#bb-orderDetailDialog')) $('#bb-orderDetailDialog').close();
               message($('#bb-adminMessage'),
                 'Order confirmed, but customer email could not be sent: ' + emailErrorDetails(emailError), true);
               return;
             }
           }
+          if (action === 'confirm' && order.type === 'booking') {
+            try {
+              if (!EMAILJS_CONFIG.serviceId || !EMAILJS_CONFIG.templateId || !EMAILJS_CONFIG.publicKey) {
+                throw new Error('Add the EmailJS booking template ID to EMAILJS_CONFIG in index.html.');
+              }
+              const customerEmail = String(order.customer && order.customer.email || '').trim();
+              if (!customerEmail) throw new Error('This booking does not have a customer email address.');
+              const emailjs = await import('https://cdn.jsdelivr.net/npm/@emailjs/browser@4/+esm');
+              const booking = order.booking || {};
+              const fulfillment = order.fulfillment || {};
+              const deliveryLocation = fulfillment.method === 'delivery' ?
+                [fulfillment.address, fulfillment.city, fulfillment.state, fulfillment.zip].filter(Boolean).join(', ') :
+                'Pickup at BIGBOYS CUSTOMS, 3100 Mansfield Hwy, Forest Hill, TX 76119';
+              const bookingDetails = [
+                'Booking ID: ' + order.id,
+                'Status: Confirmed',
+                'Customer name: ' + String(order.customer && order.customer.name || 'Customer'),
+                'Customer email: ' + customerEmail,
+                'Customer phone: ' + String(order.customer && order.customer.phone || ''),
+                'Service: ' + String(booking.service || 'Service booking'),
+                'Pickup or delivery: ' + String(fulfillment.method || 'pickup'),
+                'Location: ' + deliveryLocation,
+                'Vehicle: ' + [booking.year, booking.vehicle].filter(Boolean).join(' '),
+                'Preferred date: ' + String(booking.date || ''),
+                'Preferred time: ' + String(booking.time || ''),
+                'Details / questions: ' + String(booking.notes || order.notes || 'None')
+              ].join('\n');
+              const bookingItems = order.items || [];
+              const itemDetails = bookingItems.map((item) =>
+                item.name + ' | Qty ' + item.quantity + ' | ' + money(item.price) + ' each | ' +
+                money(item.price * item.quantity)
+              ).join('\n');
+              const itemDetailsHtml = orderEmailItems(bookingItems);
+              await emailjs.send(EMAILJS_CONFIG.serviceId, EMAILJS_CONFIG.templateId, {
+                to_email: customerEmail,
+                owner_email: OWNER_EMAIL,
+                customer_name: String(order.customer && order.customer.name || 'Customer'),
+                customer_email: customerEmail,
+                customer_phone: String(order.customer && order.customer.phone || ''),
+                name: String(order.customer && order.customer.name || 'Customer'),
+                email: customerEmail,
+                phone: String(order.customer && order.customer.phone || ''),
+                booking_id: order.id,
+                order_id: order.id,
+                order_status: 'Confirmed',
+                booking_status: 'Confirmed',
+                booking_details: bookingDetails,
+                items: itemDetails,
+                item_details: itemDetails,
+                items_html: itemDetailsHtml,
+                orders: orderEmailRows(bookingItems),
+                service: String(booking.service || 'Service booking'),
+                vehicle_year: String(booking.year || ''),
+                vehicle_make_model: String(booking.vehicle || ''),
+                vehicle: [booking.year, booking.vehicle].filter(Boolean).join(' '),
+                date: String(booking.date || ''),
+                time: String(booking.time || ''),
+                fulfillment_method: String(fulfillment.method || 'pickup'),
+                delivery_method: String(fulfillment.method || 'pickup'),
+                delivery_location: deliveryLocation,
+                street_address: String(fulfillment.address || ''),
+                city: String(fulfillment.city || ''),
+                state: String(fulfillment.state || ''),
+                zip_code: String(fulfillment.zip || ''),
+                notes: String(booking.notes || order.notes || 'None'),
+                booking_link: '',
+                order_link: ''
+              }, { publicKey: EMAILJS_CONFIG.publicKey });
+            } catch (emailError) {
+              console.error('Booking was confirmed, but the customer confirmation email failed.', emailError);
+              if (button.closest('#bb-orderDetailDialog')) $('#bb-orderDetailDialog').close();
+              message($('#bb-adminMessage'),
+                'Booking confirmed, but customer email could not be sent: ' + emailErrorDetails(emailError), true);
+              return;
+            }
+          }
+          if (button.closest('#bb-orderDetailDialog') && action !== 'details') $('#bb-orderDetailDialog').close();
           message($('#bb-adminMessage'), action === 'confirm' && order.type === 'product-order' ?
-            'Order confirmed and confirmation email sent to the customer.' : 'Booking updated.');
+            'Order confirmed and confirmation email sent to the customer.' :
+            action === 'confirm' && order.type === 'booking' ?
+              'Booking confirmed and confirmation email sent to the customer.' : 'Booking updated.');
         } catch (error) {
           message($('#bb-adminMessage'), 'Booking could not be updated: ' + error.message, true);
         }

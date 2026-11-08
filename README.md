@@ -121,25 +121,42 @@ and rules.
 ## Booking and order email notifications
 
 Booking and product-order emails use EmailJS from the browser, so Firebase Cloud
-Functions and the Firebase Blaze billing plan are not required. Both notifications go to
-the same fixed shop address, but use separate templates and separate forms. A booking
-uses the appointment form and booking template; a cart order uses the header cart, a
-separate contact/fulfillment form, and the order template. Each request is saved in
-Firestore first. Product orders appear in the staff dashboard and trigger an owner email.
-When staff confirm a product order, the site sends the customer an order-confirmation
-email with the order items, fulfillment details, and stored total. Email failures do not
-undo a saved or confirmed order; the dashboard reports a failed confirmation email.
+Functions and the Firebase Blaze billing plan are not required. Booking alerts and
+confirmations share one EmailJS template; product-order alerts and confirmations use
+separate templates and forms. A booking uses the appointment form; a cart order uses the
+header cart and a separate contact/fulfillment form. Each request is saved in Firestore
+first. Product orders appear in the staff dashboard and trigger an owner email.
+When staff confirm a product order or service booking, the site sends a confirmation
+email to that customer. Email failures do not undo a saved or confirmed request; the
+dashboard reports a failed confirmation email.
 
 1. Create a free account at [EmailJS](https://www.emailjs.com/).
 2. In EmailJS, add an email service and connect the sending mailbox. If you use Gmail,
    authorize it through EmailJS; never put your Gmail password in this project.
-3. Create a booking email template. Set the **To email** field directly to
-   `alindisindi8@gmail.com` (do not use a customer-provided value for the recipient).
-   Include these template variables in the subject/body:
+3. Use one booking email template for both the owner alert and customer confirmation.
+   Set its **To email** field to `{{to_email}}`. The site supplies the shop's fixed
+   address for new booking alerts and the customer's submitted address only after staff
+   confirm the booking. Use neutral wording such as “Booking update” and show
+   `{{booking_status}}` so the same template indicates whether a request is pending or
+   confirmed. Include `{{booking_details}}` in the email body to show the full booking in one
+   readable block, including customer contact details, service, pickup/delivery
+   location, vehicle, preferred date and time, and notes. You can also use
    `{{customer_name}}`, `{{customer_email}}`, `{{customer_phone}}`, `{{service}}`,
-   `{{vehicle}}`, `{{date}}`, `{{time}}`, `{{notes}}`, and `{{booking_link}}`.
-   A suggested message is: “You have a new booking on your website. Please review it:
-   {{booking_link}}”.
+   `{{fulfillment_method}}`, `{{delivery_location}}`, `{{vehicle_year}}`,
+   `{{vehicle_make_model}}`, `{{vehicle}}`, `{{date}}`, `{{time}}`, `{{notes}}`,
+   `{{order_id}}`, and `{{booking_link}}` individually in the subject or body.
+   The booking request also sends `{{items}}`, `{{items_html}}`, and an `orders` list
+   for EmailJS templates that display an item/service loop; service bookings include
+   the selected service as that list's item.
+   For an existing template that uses `{{name}}`, `{{email}}`, `{{phone}}`,
+   `{{delivery_method}}`, `{{street_address}}`, `{{city}}`, `{{state}}`, or
+   `{{zip_code}}`, those booking values are also sent under those names. A booking
+   template should show the service and appointment details instead of an `orders`
+   item loop. To show the owner-only dashboard link only in the pending alert, wrap its
+   button in a conditional block:
+   `{{#booking_link}}<a href="{{booking_link}}">View booking in staff dashboard</a>{{/booking_link}}`.
+   The link opens that specific request; the owner must sign in with an authorized staff
+   account if prompted. The customer confirmation does not include that staff link.
 4. Create a separate product-order email template using the same fixed **To email**
    recipient; do not use `{{email}}` or `{{customer_email}}` as its recipient. In the
    message body, use `{{customer_email}}` or `{{email}}` to display the buyer's address.
@@ -161,20 +178,22 @@ undo a saved or confirmed order; the dashboard reports a failed confirmation ema
    template's HTML body where the formatted product list should appear, or use the
    `orders` loop to customize the item layout. Use public HTTPS image URLs for photos.
 6. In EmailJS account settings, copy the **Public Key**. Also copy the service ID and
-   all three template IDs from their respective pages.
-7. In `index.html`, set `serviceId`, `templateId` (booking), `orderTemplateId` (owner
-   product-order alert), `orderConfirmationTemplateId` (customer confirmation), and
-   `publicKey` in `EMAILJS_CONFIG`. These are browser-side public identifiers, not
+   the three template IDs from their respective pages.
+7. In `index.html`, set `serviceId`, `templateId` (shared owner booking alert and
+   customer booking confirmation), `orderTemplateId` (owner product-order alert),
+   `orderConfirmationTemplateId` (customer order confirmation), and `publicKey` in
+   `EMAILJS_CONFIG`. These are browser-side public identifiers, not
    passwords. Do not put SMTP passwords, private keys, or other secrets in the page.
-8. Publish the updated website. Submit a test cart order and check the owner inbox,
-   then sign in to the staff dashboard and confirm that order. Check the customer's
-   inbox for the confirmation and verify the items and total. Check Spam and EmailJS
-   Email History if either message does not arrive.
+8. Publish the updated website. Submit a test booking and check the owner inbox, then
+   sign in to the staff dashboard and confirm that booking. Check the customer's inbox
+   for the booking confirmation. Also test a cart order and its customer confirmation.
+   Check Spam and EmailJS Email History if an email does not arrive.
 
 Because EmailJS sends from the browser, set its allowed origins/domain restrictions in
-the EmailJS dashboard to your website domain, and keep the template recipient fixed to
-the owner’s address. Check the EmailJS dashboard for current free-tier limits and
-delivery status.
+the EmailJS dashboard to your website domain. The shared booking template uses
+`{{to_email}}`: the site supplies the shop address for owner alerts and the submitted
+customer address for confirmations after staff approve a booking. Check the EmailJS
+dashboard for current free-tier limits and delivery status.
 
 ## 5. Product photos (no Storage needed)
 
