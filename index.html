@@ -3231,7 +3231,7 @@ body[data-view="admin"] .bb-footer,body[data-view="admin"] .bb-to-top{display:no
                 'Pickup at BIGBOYS CUSTOMS, 3100 Mansfield Hwy, Forest Hill, TX 76119';
               const bookingDetails = [
                 'Booking ID: ' + order.id,
-                'Status: Confirmed',
+                'Status: Your booking request has been reviewed and confirmed.',
                 'Customer name: ' + String(order.customer && order.customer.name || 'Customer'),
                 'Customer email: ' + customerEmail,
                 'Customer phone: ' + String(order.customer && order.customer.phone || ''),
@@ -3251,7 +3251,6 @@ body[data-view="admin"] .bb-footer,body[data-view="admin"] .bb-to-top{display:no
               const itemDetailsHtml = orderEmailItems(bookingItems);
               await emailjs.send(EMAILJS_CONFIG.serviceId, EMAILJS_CONFIG.templateId, {
                 to_email: customerEmail,
-                owner_email: OWNER_EMAIL,
                 customer_name: String(order.customer && order.customer.name || 'Customer'),
                 customer_email: customerEmail,
                 customer_phone: String(order.customer && order.customer.phone || ''),
@@ -3261,7 +3260,7 @@ body[data-view="admin"] .bb-footer,body[data-view="admin"] .bb-to-top{display:no
                 booking_id: order.id,
                 order_id: order.id,
                 order_status: 'Confirmed',
-                booking_status: 'Confirmed',
+                booking_status: 'Your booking request has been reviewed and confirmed.',
                 booking_details: bookingDetails,
                 items: itemDetails,
                 item_details: itemDetails,

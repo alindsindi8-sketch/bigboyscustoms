@@ -138,7 +138,9 @@ dashboard reports a failed confirmation email.
    address for new booking alerts and the customer's submitted address only after staff
    confirm the booking. Use neutral wording such as “Booking update” and show
    `{{booking_status}}` so the same template indicates whether a request is pending or
-   confirmed. Include `{{booking_details}}` in the email body to show the full booking in one
+   reviewed and confirmed. The confirmation email is sent only to the customer; leave
+   the template's CC and BCC fields empty if the owner should not receive it. Include
+   `{{booking_details}}` in the email body to show the full booking in one
    readable block, including customer contact details, service, pickup/delivery
    location, vehicle, preferred date and time, and notes. You can also use
    `{{customer_name}}`, `{{customer_email}}`, `{{customer_phone}}`, `{{service}}`,
